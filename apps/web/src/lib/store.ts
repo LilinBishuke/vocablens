@@ -7,6 +7,7 @@ import { persist } from 'zustand/middleware';
 import { createCardState, processReview, isDue, type SM2State } from './spaced-repetition';
 import type { DictionaryEntry } from './dictionary-api';
 import { syncCardToExtension, syncRemoveToExtension } from './extension-sync';
+import { supabase } from './supabase';
 
 // ─── Flashcard Types ────────────────────────────────────
 
@@ -56,6 +57,24 @@ export const useFlashcardStore = create<FlashcardStore>()(
 
         // Sync to extension (fire and forget)
         syncCardToExtension({ word, definition, createdAt: newCard.createdAt }).catch(() => {});
+
+        // Sync to Supabase if logged in
+        supabase.auth.getUser().then(({ data }) => {
+          if (!data.user) return;
+          supabase.from('flashcards').upsert({
+            user_id: data.user.id,
+            word: newCard.word,
+            definition: newCard.definition,
+            translation: newCard.translation,
+            sm2_repetitions: newCard.sm2.repetitions,
+            sm2_interval: newCard.sm2.interval,
+            sm2_ease_factor: newCard.sm2.easeFactor,
+            sm2_next_review: new Date(newCard.sm2.nextReview).toISOString(),
+            sm2_last_review: newCard.sm2.lastReview ? new Date(newCard.sm2.lastReview).toISOString() : null,
+            learned: newCard.learned,
+            source_type: 'vocablens-web',
+          }, { onConflict: 'user_id,word', ignoreDuplicates: true }).then(() => {});
+        });
 
         return true;
       },

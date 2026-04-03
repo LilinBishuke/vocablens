@@ -1,13 +1,17 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useSettingsStore, useFlashcardStore } from '@/lib/store';
+import { useAuthStore } from '@/lib/auth-store';
 import { useMemo, useState, useEffect } from 'react';
 
 export default function Header() {
   const { darkMode, toggleDarkMode } = useSettingsStore();
   const cards = useFlashcardStore(s => s.cards);
+  const { user, signOut } = useAuthStore();
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -62,6 +66,31 @@ export default function Header() {
 
       {/* Spacer */}
       <div className="flex-1" />
+
+      {/* Login / User */}
+      {mounted && (
+        user ? (
+          <button
+            onClick={() => signOut()}
+            className="p-1.5 rounded-lg text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            title={`ログイン中: ${user.email}\nクリックでログアウト`}
+          >
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+            </svg>
+          </button>
+        ) : (
+          <button
+            onClick={() => router.push('/login')}
+            className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-500 transition-colors"
+            title="ログイン（Anpandaと同期）"
+          >
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 9a3 3 0 100-6 3 3 0 000 6zM3 18a7 7 0 1114 0H3z" />
+            </svg>
+          </button>
+        )
+      )}
 
       {/* Dark mode */}
       <button
