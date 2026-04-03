@@ -10,6 +10,22 @@ export default async function HomePage() {
 
   if (!user) return null;
 
+  // Auto-create profile if missing (e.g. magic link bypassed /auth/callback)
+  const { data: existingProfile } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("id", user.id)
+    .single();
+  if (!existingProfile) {
+    await supabase.from("profiles").insert({
+      id: user.id,
+      display_name: user.user_metadata?.full_name ?? user.email?.split("@")[0],
+      avatar_url: user.user_metadata?.avatar_url ?? null,
+      invite_code: "direct",
+    });
+    await supabase.from("user_settings").insert({ user_id: user.id });
+  }
+
   const [cardsRes, dueRes, learnedRes, historyRes, recentRes, puzzleRes] =
     await Promise.all([
       supabase

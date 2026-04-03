@@ -6,7 +6,7 @@ import { getDueCards, getAllCards, reviewCard as reviewCardFn, removeCard, searc
 import { getNextReviewLabel } from '../lib/spaced-repetition.js';
 import { translateText } from '../lib/translation-api.js';
 import { getSettings, saveSettings } from '../lib/storage.js';
-import { sendMagicLink, getSession, clearSession, isLoggedIn, syncCardsToSupabase } from '../lib/supabase-sync.js';
+import { getSession, saveSession, clearSession, isLoggedIn, syncCardsToSupabase } from '../lib/supabase-sync.js';
 
 // Copy icon SVG
 const COPY_ICON = `<svg viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 10V3a1.5 1.5 0 011.5-1.5H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;

@@ -133,7 +133,7 @@ export async function syncCardsToSupabase(cards) {
         source_type: 'extension',
       }),
     });
-    if (res.ok || res.status === 409) synced++;
+    if (res.ok) synced++;
   }
 
   return { synced, total: cardList.length };
