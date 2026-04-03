@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VocabLens</title>
+  <link rel="stylesheet" href="../styles/shared.css">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Tabs -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="review">
+        Review
+        <span id="dueCount" class="due-badge" style="display: none">0</span>
+      </button>
+      <button class="tab" data-tab="cards">Cards</button>
+      <button class="tab" data-tab="settings">Settings</button>
+    </nav>
+
+    <!-- Review Tab -->
+    <div id="tab-review" class="tab-content active">
+      <div id="reviewInfo" class="review-info">
+        <p class="review-info-text">
+          間隔反復で単語を復習します。「Show Answer」で答えを確認し、覚え具合を評価してください。評価に基づいて次の復習タイミングが自動調整されます。
+        </p>
+      </div>
+
+      <!-- No cards due -->
+      <div id="reviewEmpty" class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2" fill="none"/>
+          <path d="M16 24l5 5 11-11" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p id="reviewEmptyText">No cards due for review. Add words from the side panel!</p>
+      </div>
+
+      <!-- Review card -->
+      <div id="reviewCard" class="review-card" style="display: none">
+        <div class="review-progress">
+          <span id="reviewProgress">1 / 1</span>
+        </div>
+
+        <div class="card-container">
+          <!-- Front -->
+          <div id="cardFront" class="card-face card-front">
+            <div class="card-word" id="cardWord"></div>
+            <button id="showAnswerBtn" class="btn-primary show-answer-btn">Show Answer</button>
+          </div>
+
+          <!-- Back -->
+          <div id="cardBack" class="card-face card-back" style="display: none">
+            <div class="card-word" id="cardWordBack"></div>
+            <div class="card-translation" id="cardTranslation"></div>
+            <div class="card-definition" id="cardDefinition"></div>
+            <div class="rating-buttons">
+              <button class="rating-btn rating-again" data-quality="0">
+                Again
+                <span class="rating-hint">忘れた</span>
+              </button>
+              <button class="rating-btn rating-hard" data-quality="3">
+                Hard
+                <span class="rating-hint">難しい</span>
+              </button>
+              <button class="rating-btn rating-good" data-quality="4">
+                Good
+                <span class="rating-hint">正解</span>
+              </button>
+              <button class="rating-btn rating-easy" data-quality="5">
+                Easy
+                <span class="rating-hint">即答</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Review complete -->
+      <div id="reviewComplete" class="empty-state" style="display: none">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2" fill="none"/>
+          <path d="M16 24l5 5 11-11" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p>All done! Great job reviewing your cards.</p>
+        <button id="reviewAgainBtn" class="btn-secondary" style="margin-top: 12px">Review Again</button>
+      </div>
+    </div>
+
+    <!-- Cards Tab -->
+    <div id="tab-cards" class="tab-content">
+      <div class="cards-header">
+        <input type="text" id="cardSearch" class="card-search" placeholder="Search cards...">
+        <span id="cardCount" class="card-count">0 cards</span>
+      </div>
+      <div class="cards-filter-row">
+        <label class="hide-learned-label">
+          <input type="checkbox" id="hideLearnedCheck" checked>
+          覚えた単語を非表示
+        </label>
+      </div>
+
+      <!-- Card list -->
+      <div id="cardList" class="card-list"></div>
+
+      <!-- Card detail -->
+      <div id="cardDetail" class="card-detail" style="display: none">
+        <button id="cardDetailBack" class="detail-back">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          Back to list
+        </button>
+        <div id="cardDetailContent" class="detail-content"></div>
+      </div>
+
+      <div id="cardsEmpty" class="empty-state" style="display: none">
+        <p>No flashcards yet. Add words from the side panel!</p>
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div id="tab-settings" class="tab-content">
+      <div class="settings-section">
+        <label class="setting-label">Classification System</label>
+        <select id="settingSystem" class="setting-select">
+          <option value="5level">5段階レベル</option>
+          <option value="cefr">CEFR (A1-C2)</option>
+          <option value="frequency">Frequency Bands</option>
+          <option value="tier">3-Tier (初級/中級/上級)</option>
+        </select>
+      </div>
+
+      <div class="settings-section">
+        <label class="setting-label">Translation Language</label>
+        <select id="settingLang" class="setting-select">
+          <option value="ja">日本語 (Japanese)</option>
+          <option value="zh">中文 (Chinese)</option>
+          <option value="ko">한국어 (Korean)</option>
+          <option value="en">None (English only)</option>
+        </select>
+      </div>
+
+      <div class="settings-section">
+        <label class="setting-label">Theme</label>
+        <select id="settingTheme" class="setting-select">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+
+      <div class="settings-section">
+        <label class="setting-label">Flashcard Stats</label>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-value" id="statTotal">0</span>
+            <span class="stat-label">Total Cards</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="statDue">0</span>
+            <span class="stat-label">Due Today</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <button id="openSidePanel" class="btn-primary" style="width: 100%">
+          Open Side Panel
+        </button>
+      </div>
+
+      <div class="settings-section">
+        <button id="openVideoPage" class="btn-primary" style="width: 100%; background: #7c3aed;">
+          動画で学習
+        </button>
+        <p id="ytHint" class="yt-hint" style="display: none; margin-top: 8px; font-size: 11px; color: var(--text-secondary); text-align: center;">
+          YouTube動画ページではサイドパネルで字幕分析ができます
+        </p>
+      </div>
+
+      <div class="settings-footer">
+        <p>VocabLens v1.2.0</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

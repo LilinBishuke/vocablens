@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* ── Fonts ── */
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* ── Primary ── */
+  --color-primary: #2D8DD2;
+  --color-primary-dark: #1E6BA8;
+  --color-primary-light: #5BA8E0;
+  --color-primary-glow: #2D8DD230;
+
+  /* ── Rating ── */
+  --color-again: #EF4444;
+  --color-hard: #F97316;
+  --color-good: #22C55E;
+  --color-easy: #3B82F6;
+
+  /* ── Level colors ── */
+  --color-level-1: #22C55E;
+  --color-level-2: #84CC16;
+  --color-level-3: #EAB308;
+  --color-level-4: #F97316;
+  --color-level-5: #EF4444;
+
+  --color-level-bg-1: #052E16;
+  --color-level-bg-2: #1A2E05;
+  --color-level-bg-3: #422006;
+  --color-level-bg-4: #431407;
+  --color-level-bg-5: #450A0A;
+
+  /* ── Spacing ── */
+  --spacing-page: 20px;
+  --spacing-section: 16px;
+  --spacing-card-padding: 24px;
+  --spacing-item: 12px;
+
+  /* ── Radius ── */
+  --radius-button: 14px;
+  --radius-card: 16px;
+  --radius-card-lg: 20px;
+  --radius-chip: 999px;
+  --radius-badge: 8px;
+  --radius-progress: 2px;
+
+  /* ── Shadows ── */
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.04);
+  --shadow-button-glow: 0 2px 8px rgba(45, 141, 210, 0.19);
+  --shadow-tabbar: 0 -2px 10px rgba(0, 0, 0, 0.04);
+}
+
+/* ── Semantic colors via CSS custom properties ── */
+:root {
+  --color-background: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-border: #E2E8F0;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #64748B;
+  --color-text-muted: #94A3B8;
+  --color-progress-bar: #E2E8F0;
+  --color-tab-active: #2D8DD2;
+  --color-tab-inactive: #94A3B8;
+  --color-tabbar-bg: #FFFFFF;
+  --color-tabbar-shadow: #0000000a;
+}
+
+.dark {
+  --color-background: #0F172A;
+  --color-surface: #1E293B;
+  --color-surface-border: #334155;
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #64748B;
+  --color-progress-bar: #334155;
+  --color-tab-active: #5BA8E0;
+  --color-tab-inactive: #64748B;
+  --color-tabbar-bg: #1E293B;
+  --color-tabbar-shadow: #0000001A;
+  --shadow-tabbar: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ── Base styles ── */
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Safe area for bottom tab bar ── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* ── Scrollbar hide for filter chips ── */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

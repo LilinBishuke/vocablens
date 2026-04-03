@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VocabLens</title>
+  <link rel="stylesheet" href="../styles/shared.css">
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-title">
+        <h1>VocabLens</h1>
+        <span class="page-title" id="pageTitle"></span>
+      </div>
+      <div class="header-controls">
+        <select id="systemSelect" class="system-select">
+          <option value="5level">5段階レベル</option>
+          <option value="cefr">CEFR (A1-C2)</option>
+          <option value="frequency">Frequency</option>
+          <option value="tier">3-Tier</option>
+        </select>
+        <div class="min-level-row">
+          <label for="minLevelSelect" class="min-level-label">表示下限:</label>
+          <select id="minLevelSelect" class="min-level-select">
+            <option value="1">Lv.1〜</option>
+            <option value="2">Lv.2〜</option>
+            <option value="3">Lv.3〜</option>
+            <option value="4">Lv.4〜</option>
+            <option value="5">Lv.5のみ</option>
+          </select>
+        </div>
+      </div>
+    </header>
+
+    <!-- Action bar -->
+    <div class="action-bar">
+      <button id="analyzeBtn" class="btn-primary analyze-btn">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M6 2a4 4 0 100 8 4 4 0 000-8zM1 6a5 5 0 119.45 2.04l3.25 3.26a.75.75 0 01-1.06 1.06l-3.26-3.25A5 5 0 011 6z" fill="currentColor"/>
+        </svg>
+        Analyze Page
+      </button>
+      <div id="stats" class="stats" style="display: none">
+        <span id="totalWords">0</span> unique words ·
+        <span id="classifiedWords">0</span> classified
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="loadingState" class="loading-container" style="display: none">
+      <div class="loading-spinner"></div>
+      <p>Analyzing page vocabulary...</p>
+    </div>
+
+    <!-- Empty state -->
+    <div id="emptyState" class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+        <path d="M8 8h24v32H8V8zm28 4h4v28H12v-4" stroke="currentColor" stroke-width="2" fill="none"/>
+        <path d="M14 18h12M14 24h12M14 30h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <p>Click "Analyze Page" to scan the current page's vocabulary.</p>
+    </div>
+
+    <!-- Error state -->
+    <div id="errorState" class="error-state" style="display: none"></div>
+
+    <!-- Word groups -->
+    <div id="wordGroups" class="word-groups" style="display: none"></div>
+
+    <!-- Word detail panel -->
+    <div id="wordDetail" class="word-detail" style="display: none">
+      <button id="detailBack" class="detail-back">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        Back
+      </button>
+      <div id="detailContent" class="detail-content"></div>
+    </div>
+  </div>
+
+  <script type="module" src="sidepanel.js"></script>
+</body>
+</html>

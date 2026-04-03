@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head><title>Anpan Icon Generator</title></head>
+<body style="margin:20px;font-family:system-ui">
+<h2>Anpan PWA Icon Generator</h2>
+<p>Right-click each canvas and "Save Image As..." to the <code>public/</code> folder.</p>
+
+<div style="display:flex;gap:20px;flex-wrap:wrap">
+  <div>
+    <p>icon-192.png (192x192)</p>
+    <canvas id="c192" width="192" height="192"></canvas>
+  </div>
+  <div>
+    <p>icon-512.png (512x512)</p>
+    <canvas id="c512" width="512" height="512"></canvas>
+  </div>
+  <div>
+    <p>icon-512-maskable.png (512x512, maskable)</p>
+    <canvas id="cm512" width="512" height="512"></canvas>
+  </div>
+</div>
+
+<script>
+function drawIcon(canvas, maskable) {
+  const ctx = canvas.getContext('2d');
+  const s = canvas.width;
+
+  // Background gradient
+  const grad = ctx.createLinearGradient(0, 0, s, s);
+  grad.addColorStop(0, '#2D8DD2');
+  grad.addColorStop(1, '#1E6BA8');
+
+  if (maskable) {
+    // Maskable: fill entire canvas
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, s, s);
+  } else {
+    // Rounded rect
+    const r = s * 0.21;
+    ctx.beginPath();
+    ctx.moveTo(r, 0);
+    ctx.lineTo(s - r, 0);
+    ctx.quadraticCurveTo(s, 0, s, r);
+    ctx.lineTo(s, s - r);
+    ctx.quadraticCurveTo(s, s, s - r, s);
+    ctx.lineTo(r, s);
+    ctx.quadraticCurveTo(0, s, 0, s - r);
+    ctx.lineTo(0, r);
+    ctx.quadraticCurveTo(0, 0, r, 0);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+
+  // Letter "A"
+  ctx.fillStyle = 'white';
+  ctx.font = `700 ${s * 0.55}px system-ui, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('A', s / 2, s / 2 + s * 0.03);
+}
+
+drawIcon(document.getElementById('c192'), false);
+drawIcon(document.getElementById('c512'), false);
+drawIcon(document.getElementById('cm512'), true);
+</script>
+</body>
+</html>

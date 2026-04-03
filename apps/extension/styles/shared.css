@@ -1,0 +1,233 @@
+:root {
+  /* Base colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #e9ecef;
+  --text-primary: #212529;
+  --text-secondary: #6c757d;
+  --text-muted: #adb5bd;
+  --border-color: #dee2e6;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* CEFR level colors */
+  --color-a1: #22c55e;
+  --color-a1-bg: #f0fdf4;
+  --color-a2: #84cc16;
+  --color-a2-bg: #f7fee7;
+  --color-b1: #eab308;
+  --color-b1-bg: #fefce8;
+  --color-b2: #f97316;
+  --color-b2-bg: #fff7ed;
+  --color-c1: #ef4444;
+  --color-c1-bg: #fef2f2;
+  --color-c2: #a855f7;
+  --color-c2-bg: #faf5ff;
+
+  /* Frequency band colors */
+  --color-1k: #22c55e;
+  --color-1k-bg: #f0fdf4;
+  --color-2k: #eab308;
+  --color-2k-bg: #fefce8;
+  --color-3k: #f97316;
+  --color-3k-bg: #fff7ed;
+  --color-academic: #3b82f6;
+  --color-academic-bg: #eff6ff;
+  --color-advanced: #ef4444;
+  --color-advanced-bg: #fef2f2;
+
+  /* Tier colors */
+  --color-beginner: #22c55e;
+  --color-beginner-bg: #f0fdf4;
+  --color-intermediate: #eab308;
+  --color-intermediate-bg: #fefce8;
+  --color-advanced-tier: #ef4444;
+  --color-advanced-tier-bg: #fef2f2;
+
+  /* 5-Level colors */
+  --color-lv1: #22c55e;
+  --color-lv1-bg: #f0fdf4;
+  --color-lv2: #84cc16;
+  --color-lv2-bg: #f7fee7;
+  --color-lv3: #eab308;
+  --color-lv3-bg: #fefce8;
+  --color-lv4: #f97316;
+  --color-lv4-bg: #fff7ed;
+  --color-lv5: #ef4444;
+  --color-lv5-bg: #fef2f2;
+
+  /* UI accent */
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-bg: #eff6ff;
+
+  /* Font */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', monospace;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --bg-tertiary: #0f3460;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-color: #334155;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+
+  --color-a1-bg: #052e16;
+  --color-a2-bg: #1a2e05;
+  --color-b1-bg: #2e2505;
+  --color-b2-bg: #2e1a05;
+  --color-c1-bg: #2e0505;
+  --color-c2-bg: #1e052e;
+  --color-1k-bg: #052e16;
+  --color-2k-bg: #2e2505;
+  --color-3k-bg: #2e1a05;
+  --color-academic-bg: #05162e;
+  --color-advanced-bg: #2e0505;
+  --color-beginner-bg: #052e16;
+  --color-intermediate-bg: #2e2505;
+  --color-advanced-tier-bg: #2e0505;
+  --color-lv1-bg: #052e16;
+  --color-lv2-bg: #1a2e05;
+  --color-lv3-bg: #2e2505;
+  --color-lv4-bg: #2e1a05;
+  --color-lv5-bg: #2e0505;
+
+  --accent: #60a5fa;
+  --accent-hover: #3b82f6;
+  --accent-bg: #1e3a5f;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.btn-secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.btn-secondary:hover {
+  background: var(--border-color);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.empty-state svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+  opacity: 0.5;
+}
+
+.error-state {
+  padding: 12px 16px;
+  background: var(--color-c1-bg);
+  color: var(--color-c1);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+}
+
+/* Copy button */
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.copy-btn:hover {
+  color: var(--accent);
+  background: var(--accent-bg);
+  border-color: var(--border-color);
+}
+
+.copy-btn.copied {
+  color: var(--color-lv1);
+}
+
+.copy-btn svg {
+  width: 14px;
+  height: 14px;
+}
