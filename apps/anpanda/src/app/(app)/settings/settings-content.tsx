@@ -223,17 +223,29 @@ export function SettingsContent({ email, settings, userId }: Props) {
               onChange={handleImportVocabLens}
             />
             <Divider />
-            <div className="flex items-center justify-between px-4 py-3.5">
+            <button
+              onClick={async () => {
+                const supabase = createClient();
+                const { data } = await supabase.auth.getSession();
+                const token = data.session?.access_token;
+                if (token) {
+                  await navigator.clipboard.writeText(token);
+                  setImportStatus("トークンをコピーしました");
+                  setTimeout(() => setImportStatus(""), 3000);
+                }
+              }}
+              className="flex w-full items-center justify-between px-4 py-3.5 cursor-pointer"
+            >
               <div className="flex items-center gap-3">
                 <Cloud size={18} className="text-text-muted" />
                 <span className="text-sm text-text-primary">
-                  Chrome拡張連携
+                  Chrome拡張連携トークンをコピー
                 </span>
               </div>
-              <span className="text-[13px] font-medium text-good">
-                同期済み
-              </span>
-            </div>
+              {importStatus === "トークンをコピーしました" && (
+                <span className="text-[13px] font-medium text-good">コピー済み ✓</span>
+              )}
+            </button>
           </SettingsCard>
         </SettingsSection>
       </div>

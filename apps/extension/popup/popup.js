@@ -205,22 +205,31 @@ async function initSyncUI() {
     }
   }
 
-  sendLinkBtn.addEventListener('click', async () => {
-    const email = emailInput.value.trim();
-    if (!email) return;
-    sendLinkBtn.disabled = true;
-    sendLinkBtn.textContent = '送信中...';
+  const connectBtn = document.getElementById('syncConnect');
+  const tokenInput = document.getElementById('syncToken');
+  const connectError = document.getElementById('syncConnectError');
+
+  connectBtn.addEventListener('click', async () => {
+    const token = tokenInput.value.trim();
+    if (!token) return;
+    connectBtn.disabled = true;
+    connectError.style.display = 'none';
     try {
-      await sendMagicLink(email);
-      emailSent.style.display = '';
-      emailInput.value = '';
+      // Decode JWT to get email and expiry
+      const parts = token.split('.');
+      if (parts.length !== 3) throw new Error('無効なトークンです');
+      const payload = JSON.parse(atob(parts[1]));
+      const expiresAt = payload.exp;
+      if (!expiresAt || expiresAt < Date.now() / 1000) throw new Error('トークンが期限切れです。Anpandaで再度コピーしてください。');
+
+      await saveSession({ access_token: token, refresh_token: null, expires_at: expiresAt });
+      tokenInput.value = '';
+      await refreshUI();
     } catch (e) {
-      emailSent.textContent = 'エラー: ' + e.message;
-      emailSent.style.color = '#ef4444';
-      emailSent.style.display = '';
+      connectError.textContent = 'エラー: ' + e.message;
+      connectError.style.display = '';
     }
-    sendLinkBtn.disabled = false;
-    sendLinkBtn.textContent = 'ログインリンクを送る';
+    connectBtn.disabled = false;
   });
 
   syncNowBtn.addEventListener('click', async () => {

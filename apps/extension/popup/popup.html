@@ -182,16 +182,16 @@
       <div class="settings-section">
         <label class="settings-label">Anpanda 同期</label>
         <div id="syncLoggedOut">
-          <p class="settings-hint">メールアドレスを入力してAnpandaと同期</p>
-          <input id="syncEmail" type="email" placeholder="your@email.com" class="settings-input" />
-          <button id="syncSendLink" class="btn-primary" style="width:100%;margin-top:6px">ログインリンクを送る</button>
-          <p id="syncEmailSent" style="display:none;color:#22c55e;font-size:12px;margin-top:6px">メールを確認してください</p>
+          <p class="settings-hint">Anpandaの設定→「Chrome拡張連携トークンをコピー」してここに貼り付け</p>
+          <textarea id="syncToken" placeholder="トークンをここに貼り付け..." class="settings-input" style="height:60px;resize:none;font-size:11px;word-break:break-all"></textarea>
+          <button id="syncConnect" class="btn-primary" style="width:100%;margin-top:6px">連携する</button>
+          <p id="syncConnectError" style="display:none;color:#ef4444;font-size:12px;margin-top:6px"></p>
         </div>
         <div id="syncLoggedIn" style="display:none">
           <p id="syncUserEmail" class="settings-hint" style="color:#3b82f6"></p>
           <button id="syncNow" class="btn-primary" style="width:100%">今すぐ同期</button>
           <p id="syncStatus" style="font-size:12px;margin-top:6px;color:#6b7280"></p>
-          <button id="syncLogout" style="width:100%;margin-top:6px;padding:6px;border:1px solid #e5e7eb;border-radius:6px;background:transparent;cursor:pointer;font-size:12px">ログアウト</button>
+          <button id="syncLogout" style="width:100%;margin-top:6px;padding:6px;border:1px solid #e5e7eb;border-radius:6px;background:transparent;cursor:pointer;font-size:12px">連携解除</button>
         </div>
       </div>
 
