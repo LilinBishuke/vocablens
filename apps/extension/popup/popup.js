@@ -6,6 +6,7 @@ import { getDueCards, getAllCards, reviewCard as reviewCardFn, removeCard, searc
 import { getNextReviewLabel } from '../lib/spaced-repetition.js';
 import { translateText } from '../lib/translation-api.js';
 import { getSettings, saveSettings } from '../lib/storage.js';
+import { sendMagicLink, getSession, clearSession, isLoggedIn, syncCardsToSupabase } from '../lib/supabase-sync.js';
 
 // Copy icon SVG
 const COPY_ICON = `<svg viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 10V3a1.5 1.5 0 011.5-1.5H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`;
@@ -167,10 +168,80 @@ async function init() {
     }
   } catch (e) {}
 
+  // Anpanda sync UI
+  await initSyncUI();
+
   // Initial load
   await loadReviewTab();
   await loadCardsTab();
   await loadSettingsTab();
+}
+
+async function initSyncUI() {
+  const loggedOut = document.getElementById('syncLoggedOut');
+  const loggedIn = document.getElementById('syncLoggedIn');
+  const emailInput = document.getElementById('syncEmail');
+  const sendLinkBtn = document.getElementById('syncSendLink');
+  const emailSent = document.getElementById('syncEmailSent');
+  const userEmailEl = document.getElementById('syncUserEmail');
+  const syncNowBtn = document.getElementById('syncNow');
+  const syncStatus = document.getElementById('syncStatus');
+  const logoutBtn = document.getElementById('syncLogout');
+
+  async function refreshUI() {
+    const loggedIn_ = await isLoggedIn();
+    if (loggedIn_) {
+      const session = await getSession();
+      loggedOut.style.display = 'none';
+      loggedIn.style.display = '';
+      // Decode email from JWT
+      try {
+        const payload = JSON.parse(atob(session.access_token.split('.')[1]));
+        userEmailEl.textContent = payload.email || 'ログイン中';
+      } catch { userEmailEl.textContent = 'ログイン中'; }
+    } else {
+      loggedOut.style.display = '';
+      loggedIn.style.display = 'none';
+    }
+  }
+
+  sendLinkBtn.addEventListener('click', async () => {
+    const email = emailInput.value.trim();
+    if (!email) return;
+    sendLinkBtn.disabled = true;
+    sendLinkBtn.textContent = '送信中...';
+    try {
+      await sendMagicLink(email);
+      emailSent.style.display = '';
+      emailInput.value = '';
+    } catch (e) {
+      emailSent.textContent = 'エラー: ' + e.message;
+      emailSent.style.color = '#ef4444';
+      emailSent.style.display = '';
+    }
+    sendLinkBtn.disabled = false;
+    sendLinkBtn.textContent = 'ログインリンクを送る';
+  });
+
+  syncNowBtn.addEventListener('click', async () => {
+    syncStatus.textContent = '同期中...';
+    syncNowBtn.disabled = true;
+    try {
+      const cards = await getAllCards();
+      const result = await syncCardsToSupabase(cards);
+      syncStatus.textContent = `完了: ${result.synced}/${result.total} 件`;
+    } catch (e) {
+      syncStatus.textContent = 'エラー: ' + e.message;
+    }
+    syncNowBtn.disabled = false;
+  });
+
+  logoutBtn.addEventListener('click', async () => {
+    await clearSession();
+    await refreshUI();
+  });
+
+  await refreshUI();
 }
 
 function switchTab(tabName) {

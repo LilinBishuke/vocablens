@@ -9,13 +9,15 @@
     "storage",
     "sidePanel",
     "scripting",
-    "contextMenus"
+    "contextMenus",
+    "identity"
   ],
   "host_permissions": [
     "https://www.youtube.com/*",
     "https://youtube.com/*",
     "https://api.dictionaryapi.dev/*",
-    "https://api.mymemory.translated.net/*"
+    "https://api.mymemory.translated.net/*",
+    "https://yjvowlxjhohxlhtoutab.supabase.co/*"
   ],
   "background": {
     "service_worker": "background/service-worker.js"
