@@ -3,34 +3,28 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
-  /* ── Fonts ── */
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  /* ── Fonts (next/font の CSS 変数を参照する) ── */
+  --font-sans: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
-  /* ── Primary ── */
-  --color-primary: #2D8DD2;
-  --color-primary-dark: #1E6BA8;
-  --color-primary-light: #5BA8E0;
-  --color-primary-glow: #2D8DD230;
+  /* ── Primary (Green) ── */
+  --color-primary: #1e8060;
+  --color-primary-strong: #175f48;
+  --color-primary-light: #4fbd8f;
+  --color-primary-glow: #1e806030;
 
   /* ── Rating ── */
-  --color-again: #EF4444;
-  --color-hard: #F97316;
-  --color-good: #22C55E;
-  --color-easy: #3B82F6;
+  --color-again: #ef4444;
+  --color-hard: #f97316;
+  --color-good: #22c55e;
+  --color-easy: #3b82f6;
 
-  /* ── Level colors ── */
-  --color-level-1: #22C55E;
-  --color-level-2: #84CC16;
-  --color-level-3: #EAB308;
-  --color-level-4: #F97316;
-  --color-level-5: #EF4444;
-
-  --color-level-bg-1: #052E16;
-  --color-level-bg-2: #1A2E05;
+  /* ── Level bg (dark-mode badge背景・現状維持) ── */
+  --color-level-bg-1: #052e16;
+  --color-level-bg-2: #1a2e05;
   --color-level-bg-3: #422006;
   --color-level-bg-4: #431407;
-  --color-level-bg-5: #450A0A;
+  --color-level-bg-5: #450a0a;
 
   /* ── Spacing ── */
   --spacing-page: 20px;
@@ -47,48 +41,100 @@
   --radius-progress: 2px;
 
   /* ── Shadows ── */
-  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.04);
-  --shadow-button-glow: 0 2px 8px rgba(45, 141, 210, 0.19);
-  --shadow-tabbar: 0 -2px 10px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 8px 24px rgba(18, 46, 33, 0.08), 0 2px 6px rgba(18, 46, 33, 0.04);
+  --shadow-button-glow: 0 4px 14px rgba(30, 128, 96, 0.25);
+  --shadow-tabbar: 0 -2px 10px rgba(18, 46, 33, 0.05);
 }
 
-/* ── Semantic colors via CSS custom properties ── */
+/* ── Semantic colors via CSS custom properties ──
+   Light/Dark で値が変わるトークンはここ（@theme ではなく :root/.dark）に置く */
 :root {
-  --color-background: #F8FAFC;
-  --color-surface: #FFFFFF;
-  --color-surface-border: #E2E8F0;
-  --color-text-primary: #0F172A;
-  --color-text-secondary: #64748B;
-  --color-text-muted: #94A3B8;
-  --color-progress-bar: #E2E8F0;
-  --color-tab-active: #2D8DD2;
-  --color-tab-inactive: #94A3B8;
-  --color-tabbar-bg: #FFFFFF;
+  --color-background: #f7f8f7;
+  --color-surface: #ffffff;
+  --color-surface-border: #e4e9e6;
+  --color-surface-glass: rgba(255, 255, 255, 0.72);
+  --color-border-glass: rgba(255, 255, 255, 0.65);
+  --color-on-primary: #ffffff;
+  --color-text-primary: #182420;
+  --color-text-secondary: #55675d;
+  --color-text-muted: #64766b;
+  --color-progress-bar: #e4e9e6;
+  --color-tab-active: #1e8060;
+  --color-tab-inactive: #64766b;
+  --color-tabbar-bg: rgba(255, 255, 255, 0.72);
   --color-tabbar-shadow: #0000000a;
+
+  /* 難易度色（Light: 白地でコントラスト4.5:1を満たす深色） */
+  --color-level-1: #15803d;
+  --color-level-2: #4d7c0f;
+  --color-level-3: #a16207;
+  --color-level-4: #c2410c;
+  --color-level-5: #dc2626;
+
+  /* ヒーローグラデ（Light/Dark 共通・静的） */
+  --color-hero-from: #238660;
+  --color-hero-to: #175f48;
+
+  /* 背景の色玉（グラスの透け感の受け皿） */
+  --blob-a: rgba(159, 226, 192, 0.28);
+  --blob-b: rgba(217, 239, 177, 0.24);
 }
 
 .dark {
-  --color-background: #0F172A;
-  --color-surface: #1E293B;
-  --color-surface-border: #334155;
-  --color-text-primary: #F8FAFC;
-  --color-text-secondary: #94A3B8;
-  --color-text-muted: #64748B;
-  --color-progress-bar: #334155;
-  --color-tab-active: #5BA8E0;
-  --color-tab-inactive: #64748B;
-  --color-tabbar-bg: #1E293B;
-  --color-tabbar-shadow: #0000001A;
+  --color-background: #111413;
+  --color-surface: #1a251f;
+  --color-surface-border: #2c3a33;
+  --color-surface-glass: rgba(34, 48, 42, 0.62);
+  --color-border-glass: rgba(255, 255, 255, 0.09);
+  --color-on-primary: #0e211a;
+  --color-text-primary: #f0f6f2;
+  --color-text-secondary: #a3b6ab;
+  --color-text-muted: #849889;
+  --color-progress-bar: #2c3a33;
+  --color-tab-active: #4fbd8f;
+  --color-tab-inactive: #849889;
+  --color-tabbar-bg: rgba(34, 48, 42, 0.62);
+  --color-tabbar-shadow: #0000001a;
+
+  /* 難易度色（Dark: 暗地に映える明色を維持） */
+  --color-level-1: #22c55e;
+  --color-level-2: #84cc16;
+  --color-level-3: #eab308;
+  --color-level-4: #f97316;
+  --color-level-5: #ef4444;
+
+  --blob-a: rgba(47, 156, 114, 0.14);
+  --blob-b: rgba(143, 185, 77, 0.1);
+
+  /* Dark では primary が明るくなる（トークンで上書き） */
+  --color-primary: #4fbd8f;
+  --color-primary-strong: #2f9c72;
   --shadow-tabbar: 0 -2px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* ── Base styles ── */
 body {
   background-color: var(--color-background);
+  background-image:
+    radial-gradient(340px 340px at -8% -4%, var(--blob-a), transparent 70%),
+    radial-gradient(300px 300px at 108% 32%, var(--blob-b), transparent 70%),
+    radial-gradient(320px 320px at 30% 88%, var(--blob-a), transparent 70%);
+  background-attachment: fixed;
   color: var(--color-text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── グラスカード（共通部品） ── */
+@layer components {
+  .glass-card {
+    background-color: var(--color-surface-glass);
+    border: 1px solid var(--color-border-glass);
+    box-shadow: var(--shadow-card);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+  }
 }
 
 /* ── Safe area for bottom tab bar ── */
