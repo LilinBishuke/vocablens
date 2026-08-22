@@ -17,7 +17,7 @@ export function FilterChips({ items, activeIndex, onChange }: FilterChipsProps) 
             onClick={() => onChange(i)}
             className={`shrink-0 rounded-chip px-3.5 py-2 text-sm font-medium transition-colors cursor-pointer ${
               isActive
-                ? "bg-primary text-white"
+                ? "bg-primary text-on-primary"
                 : "bg-surface border border-surface-border text-text-secondary hover:bg-surface-border/30"
             }`}
           >

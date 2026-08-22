@@ -6,7 +6,7 @@ export type ReviewMode = "card" | "writing";
 interface SessionStats {
   total: number;
   correct: number;
-  ratings: Record<string, number>; // "again" | "hard" | "good" | "easy" → count
+  ratings: Record<string, number>; // "face1"〜"face5"（5段階フェイス評価） → count
 }
 
 interface ReviewState {
@@ -37,7 +37,7 @@ interface ReviewState {
 const initialStats: SessionStats = {
   total: 0,
   correct: 0,
-  ratings: { again: 0, hard: 0, good: 0, easy: 0 },
+  ratings: { face1: 0, face2: 0, face3: 0, face4: 0, face5: 0 },
 };
 
 export const useReviewStore = create<ReviewState>((set, get) => ({
@@ -59,7 +59,7 @@ export const useReviewStore = create<ReviewState>((set, get) => ({
       mode: "card",
       isFlipped: false,
       isComplete: false,
-      sessionStats: { ...initialStats, total: 0, correct: 0, ratings: { again: 0, hard: 0, good: 0, easy: 0 } },
+      sessionStats: { ...initialStats, total: 0, correct: 0, ratings: { face1: 0, face2: 0, face3: 0, face4: 0, face5: 0 } },
       writingAnswer: "",
       writingResult: null,
       showHint: false,
