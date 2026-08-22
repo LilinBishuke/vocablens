@@ -37,10 +37,15 @@ export function CardDetailContent({
     if (!confirm("このカードを削除しますか？")) return;
 
     const supabase = createClient();
-    await supabase
+    const { error } = await supabase
       .from("flashcards")
       .update({ deleted_at: new Date().toISOString() })
       .eq("id", card.id);
+
+    if (error) {
+      alert("削除に失敗しました。もう一度お試しください。");
+      return;
+    }
 
     router.push("/cards");
     router.refresh();

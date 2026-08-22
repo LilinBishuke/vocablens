@@ -117,22 +117,35 @@ export function ReviewComplete() {
 
       {/* Body */}
       <div className="flex flex-1 flex-col items-center justify-center gap-5 px-7">
+        {/* Puzzle complete celebration */}
+        {puzzleInfo && puzzleInfo.piecesRevealed >= puzzleInfo.totalPieces && (
+          <div className="flex flex-col items-center gap-2 animate-bounce-once">
+            <span className="text-5xl">🎉</span>
+            <p className="text-lg font-bold text-primary text-center">
+              パズル完成！
+            </p>
+            <p className="text-sm text-text-secondary text-center">
+              「{puzzleInfo.puzzleName}」をコンプリートしました！
+            </p>
+          </div>
+        )}
+
         {/* Title */}
         <div className="flex flex-col items-center gap-1.5">
           <h1 className="text-2xl font-bold text-text-primary">お疲れ様！</h1>
-          {puzzleInfo ? (
+          {puzzleInfo && puzzleInfo.piecesRevealed < puzzleInfo.totalPieces ? (
             <p className="text-sm font-semibold text-primary">
               新しいピースが開放されました！
             </p>
-          ) : (
+          ) : !puzzleInfo ? (
             <p className="text-[15px] text-text-secondary">
               {total}枚復習しました
             </p>
-          )}
+          ) : null}
         </div>
 
-        {/* Puzzle preview (if active) */}
-        {puzzleInfo && (
+        {/* Puzzle preview (if active and not complete) */}
+        {puzzleInfo && puzzleInfo.piecesRevealed < puzzleInfo.totalPieces && (
           <div className="w-full overflow-hidden rounded-card border-2 border-primary bg-surface p-3 space-y-2">
             <div
               className="grid gap-[3px]"

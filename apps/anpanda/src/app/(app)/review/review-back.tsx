@@ -28,7 +28,7 @@ export function ReviewBack({ card }: { card: Flashcard }) {
     speechSynthesis.speak(utterance);
   }
 
-  async function handleRate(label: QualityLabel) {
+  function handleRate(label: QualityLabel) {
     const quality = QUALITY_MAP[label];
     const isCorrect = quality >= 3;
 
@@ -42,12 +42,13 @@ export function ReviewBack({ card }: { card: Flashcard }) {
       quality
     );
 
-    // Update store stats
+    // Update store stats + advance immediately
     rateCard(label, isCorrect);
+    nextCard();
 
-    // Persist to Supabase
+    // Persist to Supabase in background
     const supabase = createClient();
-    await Promise.all([
+    Promise.all([
       supabase
         .from("flashcards")
         .update({
@@ -65,9 +66,7 @@ export function ReviewBack({ card }: { card: Flashcard }) {
         quality,
         is_correct: isCorrect,
       }),
-    ]);
-
-    nextCard();
+    ]).catch(() => {});
   }
 
   const firstMeaning = card.definition?.meanings?.[0];

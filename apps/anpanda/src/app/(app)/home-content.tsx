@@ -117,27 +117,25 @@ export function HomeContent({
             まだ単語がありません
           </p>
         ) : (
-          <div className="overflow-hidden rounded-card border border-surface-border bg-surface">
-            {recentWords.map((w, i) => (
-              <div key={w.id}>
-                {i > 0 && <div className="h-px bg-slate-100 dark:bg-slate-700" />}
-                <Link
-                  href={`/cards/${encodeURIComponent(w.word)}`}
-                  className="flex items-center justify-between px-4 py-3"
-                >
-                  <span className="text-[15px] font-medium text-text-primary">
-                    {w.word}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    {w.translation && (
-                      <span className="text-xs text-text-muted">
-                        {w.translation}
-                      </span>
-                    )}
-                    {w.level && <LevelBadge level={Number(w.level)} />}
-                  </div>
-                </Link>
-              </div>
+          <div className="flex flex-col gap-1.5">
+            {recentWords.map((w) => (
+              <Link
+                key={w.id}
+                href={`/cards/${encodeURIComponent(w.word)}`}
+                className="flex items-center justify-between rounded-card bg-white dark:bg-slate-800 px-4 py-3 min-h-[56px]"
+              >
+                <span className="text-[15px] font-medium text-text-primary">
+                  {w.word}
+                </span>
+                <div className="flex items-center gap-2">
+                  {w.translation && (
+                    <span className="text-xs text-text-muted">
+                      {w.translation}
+                    </span>
+                  )}
+                  {w.level && <LevelBadge level={Number(w.level)} />}
+                </div>
+              </Link>
             ))}
           </div>
         )}

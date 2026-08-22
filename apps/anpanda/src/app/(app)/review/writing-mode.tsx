@@ -36,9 +36,11 @@ export function WritingMode({ card }: { card: Flashcard }) {
       );
 
       rateCard(label, isCorrect);
+      nextCard();
 
+      // Persist to Supabase in background
       const supabase = createClient();
-      await Promise.all([
+      Promise.all([
         supabase
           .from("flashcards")
           .update({
@@ -56,9 +58,7 @@ export function WritingMode({ card }: { card: Flashcard }) {
           quality,
           is_correct: isCorrect,
         }),
-      ]);
-
-      nextCard();
+      ]).catch(() => {});
       return;
     }
 

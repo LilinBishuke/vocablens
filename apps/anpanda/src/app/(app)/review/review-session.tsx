@@ -68,7 +68,7 @@ export function ReviewSession({
       />
 
       {/* Progress Bar */}
-      <div className="h-1 bg-progress-bar">
+      <div className="h-2 bg-slate-200 dark:bg-slate-700">
         <div
           className="h-full rounded-progress bg-primary transition-all duration-300"
           style={{ width: `${progressPercent}%` }}
@@ -100,7 +100,7 @@ function ReviewHeader({
   const { currentIndex, deck, nextCard } = useReviewStore();
 
   return (
-    <header className="flex h-14 items-center justify-between px-page shrink-0">
+    <header className="flex h-14 items-center justify-between px-page shrink-0 sticky top-0 z-10 bg-[#F8FAFC] dark:bg-[#0F172A]">
       <button
         onClick={onClose}
         className="text-text-muted hover:text-text-secondary transition-colors cursor-pointer"
@@ -147,14 +147,14 @@ function ModeTabs() {
   const { mode, switchMode } = useReviewStore();
 
   return (
-    <div className="flex justify-center px-page py-3">
-      <div className="flex rounded-chip bg-slate-100 dark:bg-slate-800 p-1">
+    <div className="flex justify-center px-page py-2">
+      <div className="flex rounded-chip bg-slate-200 dark:bg-slate-800 p-1">
         <button
           onClick={() => switchMode("card")}
           className={`rounded-chip px-4 py-1.5 text-[13px] transition-all cursor-pointer ${
             mode === "card"
-              ? "bg-surface font-medium text-text-primary shadow-sm"
-              : "text-text-muted"
+              ? "bg-primary font-semibold text-white shadow-sm"
+              : "text-text-muted hover:text-text-secondary"
           }`}
         >
           カード
@@ -163,8 +163,8 @@ function ModeTabs() {
           onClick={() => switchMode("writing")}
           className={`rounded-chip px-4 py-1.5 text-[13px] transition-all cursor-pointer ${
             mode === "writing"
-              ? "bg-surface font-medium text-text-primary shadow-sm"
-              : "text-text-muted"
+              ? "bg-primary font-semibold text-white shadow-sm"
+              : "text-text-muted hover:text-text-secondary"
           }`}
         >
           ライティング

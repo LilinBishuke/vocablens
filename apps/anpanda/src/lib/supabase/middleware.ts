@@ -36,6 +36,7 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isLoginPage = pathname === "/login";
   const isAuthCallback = pathname === "/auth/callback";
+  const isResetPassword = pathname === "/auth/reset-password";
   const isApi = pathname.startsWith("/api/");
   const isStaticPwa =
     pathname === "/sw.js" ||
@@ -43,8 +44,8 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/icon-") ||
     pathname.startsWith("/_next/");
 
-  // Allow API routes, auth callback, and PWA static files
-  if (isApi || isAuthCallback || isStaticPwa) {
+  // Allow API routes, auth callback, reset-password, and PWA static files
+  if (isApi || isAuthCallback || isResetPassword || isStaticPwa) {
     return supabaseResponse;
   }
 

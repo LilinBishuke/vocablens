@@ -35,7 +35,7 @@ type HeaderProps =
 export function Header(props: HeaderProps) {
   const router = useRouter();
 
-  const base = "flex h-14 items-center px-page shrink-0";
+  const base = "flex h-14 items-center px-page shrink-0 sticky top-0 z-10 bg-[#F8FAFC] dark:bg-[#0F172A]";
 
   if (props.variant === "home") {
     return (

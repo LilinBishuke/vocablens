@@ -21,7 +21,7 @@ export function TabBar({ reviewCount }: TabBarProps) {
   return (
     <nav
       role="tablist"
-      className="sticky bottom-0 z-50 flex items-center justify-around rounded-t-card-lg bg-tabbar-bg shadow-tabbar pt-3 pb-6 safe-pb"
+      className="flex items-center justify-around rounded-t-card-lg bg-tabbar-bg shadow-tabbar pt-2.5 pb-5 pb-safe shrink-0"
     >
       {tabs.map(({ href, icon: Icon, label }) => {
         const isActive =

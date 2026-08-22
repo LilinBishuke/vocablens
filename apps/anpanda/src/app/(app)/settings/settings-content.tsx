@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { Download, Upload, Cloud } from "lucide-react";
+import { Download, Upload, ChevronRight, Cloud } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { signOut } from "@/lib/supabase/actions";
 import { createClient } from "@/lib/supabase/client";
@@ -36,7 +36,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importStatus, setImportStatus] = useState<string | null>(null);
 
-  const s = settings ?? {
+  const defaults: UserSettings = {
     theme: "system",
     translation_lang: "ja",
     level_system: "5",
@@ -47,13 +47,42 @@ export function SettingsContent({ email, settings, userId }: Props) {
     auto_play_audio: true,
   };
 
-  async function updateSetting(key: string, value: unknown) {
+  const [s, setS] = useState<UserSettings>({ ...defaults, ...settings });
+  const [exportLoading, setExportLoading] = useState(false);
+
+  const langOptions = [
+    { label: "日本語", value: "ja" },
+    { label: "English", value: "en" },
+    { label: "中文", value: "zh" },
+    { label: "한국어", value: "ko" },
+  ];
+
+  const dailyLimitOptions = [
+    { label: "10枚", value: "10" },
+    { label: "20枚", value: "20" },
+    { label: "30枚", value: "30" },
+    { label: "50枚", value: "50" },
+  ];
+
+  const newCardsOptions = [
+    { label: "3枚/日", value: "3" },
+    { label: "5枚/日", value: "5" },
+    { label: "10枚/日", value: "10" },
+    { label: "20枚/日", value: "20" },
+  ];
+
+  const levelSystemOptions = [
+    { label: "3段階", value: "3" },
+    { label: "5段階", value: "5" },
+  ];
+
+  function updateSetting(key: string, value: unknown) {
+    setS((prev) => ({ ...prev, [key]: value }));
     const supabase = createClient();
-    await supabase
+    supabase
       .from("user_settings")
       .update({ [key]: value })
       .eq("user_id", userId);
-    router.refresh();
   }
 
   function cycleTheme() {
@@ -90,6 +119,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
   }
 
   async function handleExport() {
+    setExportLoading(true);
     const supabase = createClient();
     const { data: cards } = await supabase
       .from("flashcards")
@@ -126,16 +156,17 @@ export function SettingsContent({ email, settings, userId }: Props) {
     a.download = `anpan-cards-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
+    setExportLoading(false);
   }
 
   return (
     <>
       {/* Header */}
-      <div className="flex h-14 items-center px-page shrink-0">
+      <div className="sticky top-0 z-10 bg-[#F8FAFC] dark:bg-[#0F172A] flex h-14 items-center px-page shrink-0">
         <h1 className="text-lg font-bold text-text-primary">設定</h1>
       </div>
 
-      <div className="flex-1 space-y-6 overflow-y-auto px-page pb-4">
+      <div className="flex-1 space-y-6 px-page pb-4">
         {/* Account */}
         <SettingsSection label="アカウント">
           <div className="flex items-center justify-between rounded-button border border-surface-border bg-surface px-4 py-4">
@@ -158,27 +189,66 @@ export function SettingsContent({ email, settings, userId }: Props) {
               onClick={cycleTheme}
             />
             <Divider />
-            <SettingsRow label="翻訳言語" value="日本語" />
+            <SettingsPickerRow
+              label="翻訳言語"
+              value={s.translation_lang}
+              options={langOptions}
+              onSelect={(v) => updateSetting("translation_lang", v)}
+            />
             <Divider />
-            <SettingsRow label="分類システム" value={`${s.level_system}段階`} />
+            <SettingsPickerRow
+              label="分類システム"
+              value={s.level_system}
+              options={levelSystemOptions}
+              onSelect={(v) => updateSetting("level_system", v)}
+            />
           </SettingsCard>
         </SettingsSection>
 
         {/* Review */}
         <SettingsSection label="復習設定">
           <SettingsCard>
-            <SettingsRow label="1日の上限" value={`${s.daily_limit}枚`} />
+            <SettingsPickerRow
+              label="1日の上限"
+              value={String(s.daily_limit)}
+              options={dailyLimitOptions}
+              onSelect={(v) => updateSetting("daily_limit", Number(v))}
+            />
             <Divider />
-            <SettingsRow
+            <SettingsPickerRow
               label="新規カード"
-              value={`${s.new_cards_per_day}枚/日`}
+              value={String(s.new_cards_per_day)}
+              options={newCardsOptions}
+              onSelect={(v) => updateSetting("new_cards_per_day", Number(v))}
             />
             <Divider />
-            <SettingsRow
+            <SettingsToggleRow
               label="リマインダー"
-              value={s.reminder_time?.slice(0, 5) ?? "20:00"}
-              highlight
+              enabled={s.reminder_enabled}
+              onToggle={async (v) => {
+                if (v && "Notification" in window) {
+                  const permission = await Notification.requestPermission();
+                  if (permission !== "granted") return;
+                }
+                updateSetting("reminder_enabled", v);
+              }}
             />
+            {s.reminder_enabled && (
+              <>
+                <Divider />
+                <div className="flex items-center justify-between px-4 py-3.5">
+                  <span className="text-sm font-bold text-slate-400 dark:text-slate-500">
+                    通知時刻
+                  </span>
+                  <input
+                    type="time"
+                    defaultValue={s.reminder_time?.slice(0, 5) ?? "20:00"}
+                    onChange={(e) => updateSetting("reminder_time", e.target.value)}
+                    className="text-sm font-medium text-primary bg-transparent border-none outline-none cursor-pointer"
+                  />
+                </div>
+              </>
+            )}
             <Divider />
             <SettingsToggleRow
               label="音声自動再生"
@@ -193,17 +263,19 @@ export function SettingsContent({ email, settings, userId }: Props) {
           <SettingsCard>
             <button
               onClick={handleExport}
-              className="flex w-full items-center gap-3 px-4 py-3.5 cursor-pointer"
+              disabled={exportLoading}
+              className="flex w-full items-center gap-3 px-4 py-3.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Download size={18} className="text-text-muted" />
               <span className="text-sm text-text-primary">
-                エクスポート（CSV）
+                {exportLoading ? "エクスポート中..." : "エクスポート（CSV）"}
               </span>
             </button>
             <Divider />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex w-full items-center justify-between px-4 py-3.5 cursor-pointer"
+              disabled={importStatus === "読み込み中..."}
+              className="flex w-full items-center justify-between px-4 py-3.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div className="flex items-center gap-3">
                 <Upload size={18} className="text-text-muted" />
@@ -276,6 +348,63 @@ function SettingsCard({ children }: { children: React.ReactNode }) {
   );
 }
 
+function SettingsPickerRow({
+  label,
+  value,
+  options,
+  onSelect,
+}: {
+  label: string;
+  value: string;
+  options: { label: string; value: string }[];
+  onSelect: (value: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const current = options.find((o) => o.value === value);
+
+  return (
+    <div>
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between px-4 py-3.5 cursor-pointer"
+      >
+        <span className="text-sm font-bold text-slate-400 dark:text-slate-500">
+          {label}
+        </span>
+        <div className="flex items-center gap-1">
+          <span className="text-sm font-medium text-primary">
+            {current?.label ?? value}
+          </span>
+          <ChevronRight
+            size={15}
+            className={`text-primary transition-transform duration-200 ${open ? "rotate-90" : ""}`}
+          />
+        </div>
+      </button>
+      {open && (
+        <div className="px-4 pb-3.5 flex flex-wrap gap-2">
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => {
+                onSelect(opt.value);
+                setOpen(false);
+              }}
+              className={`rounded-chip px-3.5 py-1.5 text-sm transition-colors cursor-pointer ${
+                opt.value === value
+                  ? "bg-primary text-white font-medium"
+                  : "bg-slate-100 dark:bg-slate-700 text-text-secondary"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SettingsRow({
   label,
   value,
@@ -293,12 +422,15 @@ function SettingsRow({
       onClick={onClick}
       className={`flex w-full items-center justify-between px-4 py-3.5 ${onClick ? "cursor-pointer" : ""}`}
     >
-      <span className="text-sm text-text-primary">{label}</span>
-      <span
-        className={`text-sm ${highlight ? "font-medium text-primary" : "text-text-secondary"}`}
-      >
-        {value}
-      </span>
+      <span className="text-sm font-bold text-slate-400 dark:text-slate-500">{label}</span>
+      <div className="flex items-center gap-1">
+        <span
+          className={`text-sm ${highlight || onClick ? "font-medium text-primary" : "text-text-secondary"}`}
+        >
+          {value}
+        </span>
+        {onClick && <ChevronRight size={15} className="text-primary -mr-1" />}
+      </div>
     </Comp>
   );
 }
@@ -321,16 +453,24 @@ function SettingsToggleRow({
       <span className="text-sm text-text-primary">{label}</span>
       <button
         onClick={() => onToggle(!enabled)}
-        className={`relative h-[22px] w-10 rounded-full transition-colors cursor-pointer ${
+        className={`relative h-[28px] w-[50px] rounded-full transition-colors cursor-pointer ${
           enabled ? "bg-primary" : "bg-slate-300 dark:bg-slate-600"
         }`}
         role="switch"
         aria-checked={enabled}
       >
         <span
-          className={`absolute top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-transform ${
-            enabled ? "translate-x-[20px]" : "translate-x-0.5"
-          }`}
+          style={{
+            position: "absolute",
+            top: 3,
+            left: enabled ? 25 : 3,
+            height: 22,
+            width: 22,
+            borderRadius: "50%",
+            backgroundColor: "white",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+            transition: "left 0.2s ease",
+          }}
         />
       </button>
     </div>
