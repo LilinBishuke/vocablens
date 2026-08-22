@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { Sparkles, Star, BookOpen, GraduationCap, Mail, Globe } from "lucide-react";
 
@@ -76,7 +77,11 @@ export default function LoginPage() {
     });
 
     if (error) {
-      setError("送信に失敗しました");
+      if (error.status === 429 || error.message?.toLowerCase().includes("rate")) {
+        setError("送信が多すぎます。60秒待ってから再試行してください。");
+      } else {
+        setError(`送信に失敗しました: ${error.message}`);
+      }
     } else {
       setMagicLinkSent(true);
     }
@@ -113,7 +118,7 @@ export default function LoginPage() {
         {/* Panda + brand */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pt-4">
           <div className="flex h-40 w-40 items-center justify-center rounded-full bg-surface shadow-[0_4px_20px_rgba(45,141,210,0.1)] dark:bg-surface">
-            <span className="text-6xl font-bold text-primary">A</span>
+            <Image src="/logo.svg" alt="Anpanda" width={120} height={120} />
           </div>
           <div className="mt-4 flex flex-col items-center gap-1.5">
             <h1 className="text-[32px] font-bold text-text-primary">Anpanda</h1>

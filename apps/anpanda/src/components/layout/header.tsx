@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Settings, X } from "lucide-react";
 
@@ -40,9 +41,7 @@ export function Header(props: HeaderProps) {
     return (
       <header className={`${base} justify-between`}>
         <div className="flex items-center gap-2">
-          <div className="h-[34px] w-[34px] rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary">
-            A
-          </div>
+          <Image src="/logo.svg" alt="Anpanda" width={34} height={34} />
           <span className="text-lg font-bold text-text-primary">Anpanda</span>
         </div>
         <Link href="/settings" aria-label="設定">
