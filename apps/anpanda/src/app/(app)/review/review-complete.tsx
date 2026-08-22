@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useReviewStore } from "@/lib/stores/review-store";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useRef, useState } from "react";
+import { FACE_RATINGS, FaceIcon } from "@/components/ui/face-rating";
 
 interface PuzzleInfo {
   puzzleName: string;
@@ -92,10 +93,6 @@ export function ReviewComplete() {
     router.refresh();
   }
 
-  const goodEasy = (ratings.good ?? 0) + (ratings.easy ?? 0);
-  const hard = ratings.hard ?? 0;
-  const again = ratings.again ?? 0;
-
   return (
     <div className="flex flex-1 flex-col">
       {/* Header */}
@@ -146,7 +143,7 @@ export function ReviewComplete() {
 
         {/* Puzzle preview (if active and not complete) */}
         {puzzleInfo && puzzleInfo.piecesRevealed < puzzleInfo.totalPieces && (
-          <div className="w-full overflow-hidden rounded-card border-2 border-primary bg-surface p-3 space-y-2">
+          <div className="w-full overflow-hidden glass-card rounded-card border-2 border-primary p-3 space-y-2">
             <div
               className="grid gap-[3px]"
               style={{
@@ -163,9 +160,9 @@ export function ReviewComplete() {
                     key={i}
                     className={`flex aspect-[4/3] items-center justify-center rounded-[4px] text-[8px] font-bold transition-all ${
                       isNew
-                        ? "bg-primary text-white animate-pulse"
+                        ? "bg-primary text-on-primary animate-pulse"
                         : isRevealed
-                          ? "bg-blue-100 dark:bg-primary-dark"
+                          ? "bg-primary/15 dark:bg-primary-strong"
                           : "border border-surface-border"
                     }`}
                   >
@@ -187,14 +184,14 @@ export function ReviewComplete() {
 
         {/* Stats */}
         <div className="flex w-full gap-3">
-          <div className="flex flex-1 flex-col items-center gap-0.5 rounded-button border border-surface-border bg-surface p-3.5">
+          <div className="glass-card flex flex-1 flex-col items-center gap-0.5 rounded-button p-3.5">
             <span className="text-lg font-bold text-text-primary">
               {total}枚
             </span>
             <span className="text-[11px] text-text-muted">復習数</span>
           </div>
-          <div className="flex flex-1 flex-col items-center gap-0.5 rounded-button border border-surface-border bg-surface p-3.5">
-            <span className="text-lg font-bold text-good">
+          <div className="glass-card flex flex-1 flex-col items-center gap-0.5 rounded-button p-3.5">
+            <span className="text-lg font-bold text-primary">
               {accuracyPercent}%
             </span>
             <span className="text-[11px] text-text-muted">正解率</span>
@@ -203,12 +200,13 @@ export function ReviewComplete() {
 
         {/* Breakdown (only when no puzzle or compact) */}
         {!puzzleInfo && (
-          <div className="w-full overflow-hidden rounded-card border border-surface-border bg-surface">
-            <BreakdownRow color="bg-good" label="Easy / Good" count={goodEasy} />
-            <div className="h-px bg-slate-100 dark:bg-slate-700" />
-            <BreakdownRow color="bg-hard" label="Hard" count={hard} />
-            <div className="h-px bg-slate-100 dark:bg-slate-700" />
-            <BreakdownRow color="bg-again" label="Again" count={again} />
+          <div className="glass-card w-full overflow-hidden rounded-card">
+            {FACE_RATINGS.map((r, i) => (
+              <div key={r.key}>
+                {i > 0 && <div className="h-px bg-surface-border" />}
+                <BreakdownRow faceIndex={i} label={r.label} count={ratings[r.key] ?? 0} />
+              </div>
+            ))}
           </div>
         )}
       </div>
@@ -217,7 +215,7 @@ export function ReviewComplete() {
       <div className="space-y-3 px-page pb-8 pt-4">
         <button
           onClick={handleRestart}
-          className="flex h-12 w-full items-center justify-center rounded-button bg-primary text-base font-semibold text-white shadow-button-glow cursor-pointer"
+          className="flex h-12 w-full items-center justify-center rounded-button bg-primary text-base font-semibold text-on-primary shadow-button-glow cursor-pointer"
         >
           もう一度復習する
         </button>
@@ -226,7 +224,7 @@ export function ReviewComplete() {
             reset();
             router.push("/");
           }}
-          className="flex h-12 w-full items-center justify-center rounded-button border border-surface-border bg-surface text-base font-medium text-text-primary cursor-pointer"
+          className="flex h-12 w-full items-center justify-center glass-card rounded-button text-base font-medium text-text-primary cursor-pointer"
         >
           ホームに戻る
         </button>
@@ -236,18 +234,18 @@ export function ReviewComplete() {
 }
 
 function BreakdownRow({
-  color,
+  faceIndex,
   label,
   count,
 }: {
-  color: string;
+  faceIndex: number;
   label: string;
   count: number;
 }) {
   return (
-    <div className="flex items-center justify-between px-4 py-3">
-      <div className="flex items-center gap-2">
-        <div className={`h-3 w-3 rounded-sm ${color}`} />
+    <div className="flex items-center justify-between px-4 py-2.5">
+      <div className="flex items-center gap-2.5">
+        <FaceIcon index={faceIndex} size={20} className={count > 0 ? "text-primary" : "text-text-muted/55"} />
         <span className="text-sm text-text-secondary">{label}</span>
       </div>
       <span className="text-sm font-medium text-text-primary">{count}枚</span>

@@ -77,7 +77,7 @@ export function WritingMode({ card }: { card: Flashcard }) {
     <>
       <div className="flex flex-1 items-center justify-center px-6">
         <div
-          className={`flex w-full flex-col items-center gap-4 rounded-card-lg border bg-surface p-7 shadow-card ${resultBorder}`}
+          className={`flex w-full flex-col items-center gap-4 glass-card rounded-card-lg p-7 ${resultBorder}`}
         >
           <span className="text-[13px] text-text-muted">
             この意味の英単語は？
@@ -89,7 +89,7 @@ export function WritingMode({ card }: { card: Flashcard }) {
           </span>
 
           {/* POS + character count hint */}
-          <span className="rounded-chip bg-slate-100 dark:bg-slate-800 px-3 py-1 text-xs text-text-muted">
+          <span className="rounded-chip bg-progress-bar px-3 py-1 text-xs text-text-muted">
             {card.definition?.pos ?? "Word"} · {card.word.length}文字
           </span>
 
@@ -149,7 +149,7 @@ export function WritingMode({ card }: { card: Flashcard }) {
         <button
           onClick={handleSubmit}
           disabled={!writingAnswer.trim() && !writingResult}
-          className="flex h-12 w-full items-center justify-center rounded-button bg-primary text-base font-semibold text-white shadow-button-glow transition-all active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="flex h-12 w-full items-center justify-center rounded-button bg-primary text-base font-semibold text-on-primary shadow-button-glow transition-all active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           {writingResult ? "次へ" : "回答する"}
         </button>

@@ -53,7 +53,7 @@ export function CardsContent({
   return (
     <>
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[#F8FAFC] dark:bg-[#0F172A] flex h-14 items-center justify-between px-page shrink-0">
+      <div className="sticky top-0 z-10 bg-background flex h-14 items-center justify-between px-page shrink-0">
         <h1 className="text-lg font-bold text-text-primary">カード一覧</h1>
         <span className="text-sm text-text-muted">{totalCount}枚</span>
       </div>
@@ -79,7 +79,7 @@ export function CardsContent({
         ) : (
           <div className="flex flex-col gap-1.5 pb-4">
             {filtered.map((card) => (
-              <div key={card.id} className="overflow-hidden rounded-card bg-white dark:bg-slate-800">
+              <div key={card.id} className="glass-card overflow-hidden rounded-card">
                 <CardRow card={card} />
               </div>
             ))}

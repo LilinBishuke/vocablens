@@ -167,24 +167,24 @@ export default function LoginPage() {
   const inputClass =
     "h-12 w-full rounded-button border border-surface-border bg-surface px-4 text-[15px] text-text-primary placeholder:text-text-muted outline-none focus:border-primary transition-colors";
   const btnPrimary =
-    "flex h-12 w-full items-center justify-center rounded-button bg-primary text-base font-semibold text-white shadow-button-glow transition-all hover:bg-primary-dark active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer";
+    "flex h-12 w-full items-center justify-center rounded-button bg-primary text-base font-semibold text-on-primary shadow-button-glow transition-all hover:bg-primary-strong active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer";
   const btnSecondary =
     "flex h-12 w-full items-center justify-center gap-2.5 rounded-button border border-surface-border bg-surface text-[15px] font-medium text-text-primary transition-all hover:bg-surface-border/30 active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer";
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">
       {/* Hero */}
-      <div className="relative h-[320px] overflow-hidden bg-gradient-to-b from-blue-100 to-background dark:from-blue-950 dark:to-background">
-        <div className="absolute -left-15 -top-10 h-[200px] w-[200px] rounded-full bg-blue-200/25 dark:bg-[#1E3A5F]/40" />
-        <div className="absolute right-[-10px] top-5 h-[150px] w-[150px] rounded-full bg-blue-300/12 dark:bg-[#1E3A5F]/30" />
-        <div className="absolute right-[30px] bottom-[20px] h-[100px] w-[100px] rounded-full bg-blue-200/18 dark:bg-[#1E3A5F]/25" />
-        <Sparkles size={18} className="absolute left-[50px] top-[140px] text-blue-300/25 dark:text-primary-light/19" />
-        <Star size={14} className="absolute right-[60px] top-[160px] text-blue-300/18 dark:text-primary-light/12" />
-        <BookOpen size={16} className="absolute right-[80px] bottom-[60px] text-blue-300/15 dark:text-primary-light/9" />
-        <GraduationCap size={14} className="absolute left-[30px] bottom-[70px] text-blue-300/18 dark:text-primary-light/12" />
+      <div className="relative h-[320px] overflow-hidden bg-gradient-to-b from-primary/15 to-background dark:from-primary/10 dark:to-background">
+        <div className="absolute -left-15 -top-10 h-[200px] w-[200px] rounded-full bg-primary/15 dark:bg-primary/20" />
+        <div className="absolute right-[-10px] top-5 h-[150px] w-[150px] rounded-full bg-primary-light/15 dark:bg-primary/15" />
+        <div className="absolute right-[30px] bottom-[20px] h-[100px] w-[100px] rounded-full bg-primary/10 dark:bg-primary/15" />
+        <Sparkles size={18} className="absolute left-[50px] top-[140px] text-primary/25 dark:text-primary-light/19" />
+        <Star size={14} className="absolute right-[60px] top-[160px] text-primary/20 dark:text-primary-light/12" />
+        <BookOpen size={16} className="absolute right-[80px] bottom-[60px] text-primary/15 dark:text-primary-light/9" />
+        <GraduationCap size={14} className="absolute left-[30px] bottom-[70px] text-primary/20 dark:text-primary-light/12" />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center pt-4">
-          <div className="flex h-40 w-40 items-center justify-center rounded-full bg-white shadow-[0_4px_20px_rgba(45,141,210,0.15)]">
+          <div className="flex h-40 w-40 items-center justify-center rounded-full bg-white shadow-[0_4px_20px_rgba(30,128,96,0.15)]">
             <Image src="/logo.svg" alt="Anpanda" width={144} height={144} className="object-contain" unoptimized />
           </div>
           <div className="mt-4 flex flex-col items-center gap-1">
@@ -203,7 +203,7 @@ export default function LoginPage() {
               onClick={() => switchTab(t)}
               className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all cursor-pointer ${
                 tab === t
-                  ? "bg-primary text-white shadow-sm"
+                  ? "bg-primary text-on-primary shadow-sm"
                   : "text-text-muted"
               }`}
             >

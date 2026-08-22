@@ -162,14 +162,14 @@ export function SettingsContent({ email, settings, userId }: Props) {
   return (
     <>
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-[#F8FAFC] dark:bg-[#0F172A] flex h-14 items-center px-page shrink-0">
+      <div className="sticky top-0 z-10 bg-background flex h-14 items-center px-page shrink-0">
         <h1 className="text-lg font-bold text-text-primary">設定</h1>
       </div>
 
       <div className="flex-1 space-y-6 px-page pb-4">
         {/* Account */}
         <SettingsSection label="アカウント">
-          <div className="flex items-center justify-between rounded-button border border-surface-border bg-surface px-4 py-4">
+          <div className="flex items-center justify-between glass-card rounded-button px-4 py-4">
             <span className="text-sm text-text-primary">{email}</span>
             <button
               onClick={() => signOut()}
@@ -237,7 +237,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
               <>
                 <Divider />
                 <div className="flex items-center justify-between px-4 py-3.5">
-                  <span className="text-sm font-bold text-slate-400 dark:text-slate-500">
+                  <span className="text-sm font-bold text-text-muted">
                     通知時刻
                   </span>
                   <input
@@ -342,7 +342,7 @@ function SettingsSection({
 
 function SettingsCard({ children }: { children: React.ReactNode }) {
   return (
-    <div className="overflow-hidden rounded-button border border-surface-border bg-surface">
+    <div className="overflow-hidden glass-card rounded-button">
       {children}
     </div>
   );
@@ -368,7 +368,7 @@ function SettingsPickerRow({
         onClick={() => setOpen(!open)}
         className="flex w-full items-center justify-between px-4 py-3.5 cursor-pointer"
       >
-        <span className="text-sm font-bold text-slate-400 dark:text-slate-500">
+        <span className="text-sm font-bold text-text-muted">
           {label}
         </span>
         <div className="flex items-center gap-1">
@@ -392,8 +392,8 @@ function SettingsPickerRow({
               }}
               className={`rounded-chip px-3.5 py-1.5 text-sm transition-colors cursor-pointer ${
                 opt.value === value
-                  ? "bg-primary text-white font-medium"
-                  : "bg-slate-100 dark:bg-slate-700 text-text-secondary"
+                  ? "bg-primary text-on-primary font-medium"
+                  : "bg-progress-bar text-text-secondary"
               }`}
             >
               {opt.label}
@@ -422,7 +422,7 @@ function SettingsRow({
       onClick={onClick}
       className={`flex w-full items-center justify-between px-4 py-3.5 ${onClick ? "cursor-pointer" : ""}`}
     >
-      <span className="text-sm font-bold text-slate-400 dark:text-slate-500">{label}</span>
+      <span className="text-sm font-bold text-text-muted">{label}</span>
       <div className="flex items-center gap-1">
         <span
           className={`text-sm ${highlight || onClick ? "font-medium text-primary" : "text-text-secondary"}`}
@@ -436,7 +436,7 @@ function SettingsRow({
 }
 
 function Divider() {
-  return <div className="h-px bg-slate-100 dark:bg-slate-700" />;
+  return <div className="h-px bg-surface-border" />;
 }
 
 function SettingsToggleRow({
@@ -454,7 +454,7 @@ function SettingsToggleRow({
       <button
         onClick={() => onToggle(!enabled)}
         className={`relative h-[28px] w-[50px] rounded-full transition-colors cursor-pointer ${
-          enabled ? "bg-primary" : "bg-slate-300 dark:bg-slate-600"
+          enabled ? "bg-primary" : "bg-text-muted/35"
         }`}
         role="switch"
         aria-checked={enabled}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useReviewStore } from "@/lib/stores/review-store";
 import type { Flashcard } from "@/lib/types";
@@ -39,7 +40,7 @@ export function ReviewSession({
         </p>
         <button
           onClick={() => router.push("/")}
-          className="mt-2 rounded-button bg-primary px-6 py-3 text-sm font-semibold text-white shadow-button-glow cursor-pointer"
+          className="mt-2 rounded-button bg-primary px-6 py-3 text-sm font-semibold text-on-primary shadow-button-glow cursor-pointer"
         >
           ホームに戻る
         </button>
@@ -68,7 +69,7 @@ export function ReviewSession({
       />
 
       {/* Progress Bar */}
-      <div className="h-2 bg-slate-200 dark:bg-slate-700">
+      <div className="h-2 bg-progress-bar">
         <div
           className="h-full rounded-progress bg-primary transition-all duration-300"
           style={{ width: `${progressPercent}%` }}
@@ -100,13 +101,13 @@ function ReviewHeader({
   const { currentIndex, deck, nextCard } = useReviewStore();
 
   return (
-    <header className="flex h-14 items-center justify-between px-page shrink-0 sticky top-0 z-10 bg-[#F8FAFC] dark:bg-[#0F172A]">
+    <header className="flex h-14 items-center justify-between px-page shrink-0 sticky top-0 z-10 bg-background">
       <button
         onClick={onClose}
         className="text-text-muted hover:text-text-secondary transition-colors cursor-pointer"
         aria-label="閉じる"
       >
-        <XIcon />
+        <X size={22} strokeWidth={2} />
       </button>
       <span className="text-base font-medium text-text-primary">
         {progress}
@@ -125,35 +126,17 @@ function ReviewHeader({
   );
 }
 
-function XIcon() {
-  return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  );
-}
-
 function ModeTabs() {
   const { mode, switchMode } = useReviewStore();
 
   return (
     <div className="flex justify-center px-page py-2">
-      <div className="flex rounded-chip bg-slate-200 dark:bg-slate-800 p-1">
+      <div className="glass-card flex rounded-chip p-1">
         <button
           onClick={() => switchMode("card")}
           className={`rounded-chip px-4 py-1.5 text-[13px] transition-all cursor-pointer ${
             mode === "card"
-              ? "bg-primary font-semibold text-white shadow-sm"
+              ? "bg-primary font-semibold text-on-primary shadow-sm"
               : "text-text-muted hover:text-text-secondary"
           }`}
         >
@@ -163,7 +146,7 @@ function ModeTabs() {
           onClick={() => switchMode("writing")}
           className={`rounded-chip px-4 py-1.5 text-[13px] transition-all cursor-pointer ${
             mode === "writing"
-              ? "bg-primary font-semibold text-white shadow-sm"
+              ? "bg-primary font-semibold text-on-primary shadow-sm"
               : "text-text-muted hover:text-text-secondary"
           }`}
         >

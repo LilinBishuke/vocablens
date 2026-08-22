@@ -1,23 +1,12 @@
 "use client";
 
-import { Volume2, ArrowLeft, ArrowRight } from "lucide-react";
+import { Volume2 } from "lucide-react";
 import { useReviewStore } from "@/lib/stores/review-store";
-import { calculateSM2, QUALITY_MAP, type QualityLabel } from "@/lib/utils/sm2";
+import { calculateSM2 } from "@/lib/utils/sm2";
 import { createClient } from "@/lib/supabase/client";
 import { LevelBadge } from "@/components/ui";
+import { FaceRating, type FaceRatingEntry } from "@/components/ui/face-rating";
 import type { Flashcard } from "@/lib/types";
-
-const RATING_BUTTONS: {
-  label: QualityLabel;
-  display: string;
-  color: string;
-  border: string;
-}[] = [
-  { label: "again", display: "Again", color: "text-again", border: "border-again" },
-  { label: "hard", display: "Hard", color: "text-hard", border: "border-hard" },
-  { label: "good", display: "Good", color: "text-good", border: "border-good" },
-  { label: "easy", display: "Easy", color: "text-easy", border: "border-easy" },
-];
 
 export function ReviewBack({ card }: { card: Flashcard }) {
   const { rateCard, nextCard } = useReviewStore();
@@ -28,8 +17,8 @@ export function ReviewBack({ card }: { card: Flashcard }) {
     speechSynthesis.speak(utterance);
   }
 
-  function handleRate(label: QualityLabel) {
-    const quality = QUALITY_MAP[label];
+  function handleRate(rating: FaceRatingEntry) {
+    const quality = rating.quality;
     const isCorrect = quality >= 3;
 
     // Calculate SM-2
@@ -43,7 +32,7 @@ export function ReviewBack({ card }: { card: Flashcard }) {
     );
 
     // Update store stats + advance immediately
-    rateCard(label, isCorrect);
+    rateCard(rating.key, isCorrect);
     nextCard();
 
     // Persist to Supabase in background
@@ -74,7 +63,7 @@ export function ReviewBack({ card }: { card: Flashcard }) {
   return (
     <>
       <div className="flex flex-1 items-center justify-center px-6">
-        <div className="flex w-full flex-col items-center gap-3 rounded-card-lg border border-surface-border bg-surface p-6 shadow-card">
+        <div className="glass-card flex w-full flex-col items-center gap-3 rounded-card-lg p-6">
           {/* Word */}
           <span className="font-mono text-[28px] font-bold text-text-primary">
             {card.word}
@@ -88,7 +77,7 @@ export function ReviewBack({ card }: { card: Flashcard }) {
           {/* Audio button */}
           <button
             onClick={handleSpeak}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-700 cursor-pointer"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 cursor-pointer"
             aria-label="発音を再生"
           >
             <Volume2 size={18} className="text-primary" />
@@ -117,36 +106,17 @@ export function ReviewBack({ card }: { card: Flashcard }) {
             </p>
           )}
 
-          {/* Level badge */}
+          {/* Level */}
           {card.level && <LevelBadge level={Number(card.level)} showLabel />}
         </div>
       </div>
 
-      {/* Bottom buttons */}
-      <div className="space-y-2.5 px-page pb-7 pt-2">
-        {/* Swipe hint */}
-        <div className="flex items-center justify-center gap-4 text-[11px] text-text-muted">
-          <span className="flex items-center gap-1">
-            <ArrowLeft size={14} /> Again
-          </span>
-          <span>スワイプで評価</span>
-          <span className="flex items-center gap-1">
-            Good <ArrowRight size={14} />
-          </span>
-        </div>
-
-        {/* Rating buttons */}
-        <div className="flex gap-2">
-          {RATING_BUTTONS.map(({ label, display, color, border }) => (
-            <button
-              key={label}
-              onClick={() => handleRate(label)}
-              className={`flex h-12 flex-1 items-center justify-center rounded-chip border-[1.5px] bg-surface text-sm font-semibold transition-all active:scale-95 cursor-pointer ${color} ${border}`}
-            >
-              {display}
-            </button>
-          ))}
-        </div>
+      {/* Bottom: 5段階フェイス評価 */}
+      <div className="space-y-3 px-page pb-7 pt-2">
+        <p className="text-center text-[11px] text-text-muted">
+          覚えていましたか？
+        </p>
+        <FaceRating onRate={handleRate} />
       </div>
     </>
   );

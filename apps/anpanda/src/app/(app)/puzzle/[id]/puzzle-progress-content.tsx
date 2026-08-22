@@ -58,7 +58,7 @@ export function PuzzleProgressContent({ puzzle, piecesRevealed }: Props) {
         </div>
 
         {/* Puzzle grid */}
-        <div className="w-full overflow-hidden rounded-card border border-surface-border bg-surface p-3">
+        <div className="w-full overflow-hidden glass-card rounded-card p-3">
           <div
             className="grid gap-[3px]"
             style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
@@ -70,7 +70,7 @@ export function PuzzleProgressContent({ puzzle, piecesRevealed }: Props) {
                   key={i}
                   className={`aspect-square rounded-[4px] ${
                     isRevealed
-                      ? "bg-blue-100 dark:bg-primary-dark"
+                      ? "bg-primary/15 dark:bg-primary-strong"
                       : "border border-surface-border"
                   }`}
                 />
@@ -82,7 +82,7 @@ export function PuzzleProgressContent({ puzzle, piecesRevealed }: Props) {
         {/* Legend */}
         <div className="flex items-center justify-center gap-5">
           <div className="flex items-center gap-1.5">
-            <div className="h-3 w-3 rounded-sm bg-blue-100 dark:bg-primary-dark" />
+            <div className="h-3 w-3 rounded-sm bg-primary/15 dark:bg-primary-strong" />
             <span className="text-xs text-text-secondary">開放済み</span>
           </div>
           <div className="flex items-center gap-1.5">

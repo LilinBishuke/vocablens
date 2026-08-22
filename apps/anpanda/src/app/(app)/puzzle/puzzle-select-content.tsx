@@ -85,7 +85,7 @@ export function PuzzleSelectContent({ puzzles, userPuzzles, userId }: Props) {
               <button
                 key={puzzle.id}
                 onClick={() => handleSelect(puzzle.id)}
-                className={`flex flex-col overflow-hidden rounded-card bg-surface text-left transition-all cursor-pointer ${
+                className={`flex flex-col overflow-hidden glass-card rounded-card text-left transition-all cursor-pointer ${
                   isActive
                     ? "border-2 border-primary"
                     : "border border-surface-border"
@@ -94,7 +94,7 @@ export function PuzzleSelectContent({ puzzles, userPuzzles, userId }: Props) {
                 {/* Thumbnail */}
                 <div
                   className={`flex h-[110px] w-full items-center justify-center ${
-                    isActive ? "bg-blue-50 dark:bg-blue-950/30" : "bg-slate-100 dark:bg-slate-800"
+                    isActive ? "bg-primary/10" : "bg-progress-bar/60"
                   }`}
                 >
                   <PuzzleIcon
@@ -110,7 +110,7 @@ export function PuzzleSelectContent({ puzzles, userPuzzles, userId }: Props) {
                       {puzzle.name}
                     </span>
                     {isActive && (
-                      <span className="rounded-badge bg-primary px-2 py-0.5 text-[10px] font-semibold text-white">
+                      <span className="rounded-badge bg-primary px-2 py-0.5 text-[10px] font-semibold text-on-primary">
                         進行中
                       </span>
                     )}

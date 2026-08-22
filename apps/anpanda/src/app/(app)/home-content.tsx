@@ -63,7 +63,7 @@ export function HomeContent({
       )}
 
       {/* Hero Card */}
-      <div className="relative overflow-hidden rounded-card-lg bg-gradient-to-br from-primary to-primary-dark p-0">
+      <div className="relative overflow-hidden rounded-card-lg bg-gradient-to-br from-hero-from to-hero-to p-0">
         {/* Decorative */}
         <div className="absolute right-3 -top-2.5 h-[50px] w-[50px] rounded-full bg-white/6" />
         <div className="absolute -left-4 bottom-2 h-[70px] w-[70px] rounded-full bg-white/5" />
@@ -81,7 +81,7 @@ export function HomeContent({
           <div className="mt-4 flex items-center justify-between">
             <Link
               href="/review"
-              className="inline-flex h-[34px] items-center justify-center rounded-chip bg-white px-5 text-xs font-semibold text-primary"
+              className="inline-flex h-[34px] items-center justify-center rounded-chip bg-white px-5 text-xs font-semibold text-hero-to"
             >
               復習を始める
             </Link>
@@ -97,13 +97,9 @@ export function HomeContent({
       </div>
 
       {/* Stat Chips */}
-      <div className="flex justify-center gap-2">
+      <div className="flex items-start gap-2">
         <StatChip value={String(stats.learnedCount)} label="覚えた" />
-        <StatChip
-          value={`${stats.accuracyPercent}%`}
-          label="正解率"
-          valueColor="text-good"
-        />
+        <StatChip value={`${stats.accuracyPercent}%`} label="正解率" />
         <StatChip value={String(stats.totalCards)} label="カード" />
       </div>
 
@@ -122,7 +118,7 @@ export function HomeContent({
               <Link
                 key={w.id}
                 href={`/cards/${encodeURIComponent(w.word)}`}
-                className="flex items-center justify-between rounded-card bg-white dark:bg-slate-800 px-4 py-3 min-h-[56px]"
+                className="flex items-center justify-between glass-card rounded-card px-4 py-3 min-h-[56px]"
               >
                 <span className="text-[15px] font-medium text-text-primary">
                   {w.word}
@@ -154,9 +150,12 @@ function StatChip({
   valueColor?: string;
 }) {
   return (
-    <div className="flex items-center gap-1.5 rounded-chip border border-surface-border bg-surface px-3 py-1.5">
-      <span className={`text-sm font-bold ${valueColor}`}>{value}</span>
-      <span className="text-[11px] text-text-secondary">{label}</span>
+    <div className="flex flex-1 flex-col items-center gap-0.5">
+      <div className="flex items-center gap-1.5">
+        <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+        <span className={`text-[17px] font-bold ${valueColor}`}>{value}</span>
+      </div>
+      <span className="text-[10px] text-text-muted">{label}</span>
     </div>
   );
 }

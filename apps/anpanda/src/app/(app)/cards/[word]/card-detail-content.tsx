@@ -82,7 +82,7 @@ export function CardDetailContent({
       </header>
 
       {/* Hero */}
-      <div className="bg-gradient-to-b from-blue-100 to-background dark:from-blue-950 dark:to-background px-6 py-5 space-y-2">
+      <div className="bg-gradient-to-b from-primary/15 to-background dark:from-primary/10 dark:to-background px-6 py-5 space-y-2">
         <h1 className="font-mono text-[32px] font-bold text-text-primary">
           {card.word}
         </h1>
@@ -107,7 +107,7 @@ export function CardDetailContent({
             <LevelBadge level={Number(card.level)} showLabel />
           )}
           {card.learned && (
-            <span className="inline-flex items-center gap-1 rounded-badge bg-slate-100 dark:bg-slate-700 px-2.5 py-0.5 text-[11px] text-text-muted">
+            <span className="inline-flex items-center gap-1 rounded-badge bg-progress-bar px-2.5 py-0.5 text-[11px] text-text-muted">
               <Check size={12} />
               覚えた
             </span>
@@ -141,7 +141,7 @@ export function CardDetailContent({
                   → {m.ja}
                 </p>
                 {m.examples.length > 0 && (
-                  <div className="rounded-[10px] bg-slate-100 dark:bg-slate-700/50 px-3.5 py-2.5">
+                  <div className="rounded-[10px] bg-primary/10 px-3.5 py-2.5">
                     {m.examples.map((ex, j) => (
                       <p
                         key={j}
@@ -173,16 +173,16 @@ export function CardDetailContent({
           <h3 className="text-[15px] font-semibold text-text-primary">
             学習記録
           </h3>
-          <div className="overflow-hidden rounded-button border border-surface-border bg-surface">
+          <div className="overflow-hidden glass-card rounded-button">
             <RecordRow
               label="追加日"
               value={new Date(card.created_at).toLocaleDateString("ja-JP")}
             />
-            <div className="h-px bg-slate-100 dark:bg-slate-700" />
+            <div className="h-px bg-surface-border" />
             <RecordRow label="復習回数" value={`${reviewCount}回`} />
-            <div className="h-px bg-slate-100 dark:bg-slate-700" />
+            <div className="h-px bg-surface-border" />
             <RecordRow label="正解率" value={`${accuracy}%`} />
-            <div className="h-px bg-slate-100 dark:bg-slate-700" />
+            <div className="h-px bg-surface-border" />
             <RecordRow label="次の復習" value={nextLabel} highlight />
           </div>
         </div>
@@ -198,7 +198,7 @@ export function CardDetailContent({
                 href={card.source_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-button border border-surface-border bg-surface px-4 py-3"
+                className="flex items-center gap-3 glass-card rounded-button px-4 py-3"
               >
                 <PlayCircle
                   size={20}

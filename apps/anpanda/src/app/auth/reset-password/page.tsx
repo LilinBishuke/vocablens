@@ -56,7 +56,7 @@ function ResetPasswordForm() {
   const inputClass =
     "h-12 w-full rounded-button border border-surface-border bg-surface px-4 text-[15px] text-text-primary placeholder:text-text-muted outline-none focus:border-primary transition-colors";
   const btnPrimary =
-    "flex h-12 w-full items-center justify-center rounded-button bg-primary text-base font-semibold text-white shadow-button-glow transition-all hover:bg-primary-dark active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer";
+    "flex h-12 w-full items-center justify-center rounded-button bg-primary text-base font-semibold text-on-primary shadow-button-glow transition-all hover:bg-primary-strong active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer";
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-8">
