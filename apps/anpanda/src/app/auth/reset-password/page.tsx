@@ -16,19 +16,37 @@ function ResetPasswordForm() {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
+    const tokenHash = searchParams.get("token_hash");
     const code = searchParams.get("code");
-    if (!code) {
-      setError("無効なリンクです");
+    const supabase = createClient();
+
+    // token_hash 方式: どのブラウザで開いても検証できる（メールリンク用の推奨方式）
+    if (tokenHash) {
+      supabase.auth
+        .verifyOtp({ type: "recovery", token_hash: tokenHash })
+        .then(({ error }) => {
+          if (error) {
+            setError("リンクの有効期限が切れています。もう一度リセットリンクをリクエストしてください。");
+          } else {
+            setSessionReady(true);
+          }
+        });
       return;
     }
-    const supabase = createClient();
-    supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-      if (error) {
-        setError("リンクの有効期限が切れています。もう一度リセットリンクをリクエストしてください。");
-      } else {
-        setSessionReady(true);
-      }
-    });
+    // code 方式（旧リンク互換）: リセットを申請したブラウザと同じブラウザでのみ成立する
+    if (code) {
+      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+        if (error) {
+          setError(
+            "このリンクは、リセットを申請したときと同じブラウザで開く必要があります。開けない場合はもう一度リセットをリクエストしてください。"
+          );
+        } else {
+          setSessionReady(true);
+        }
+      });
+      return;
+    }
+    setError("無効なリンクです");
   }, [searchParams]);
 
   async function handleUpdate() {
