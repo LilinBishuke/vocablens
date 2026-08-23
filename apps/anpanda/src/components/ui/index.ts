@@ -3,3 +3,4 @@ export { Card } from "./card";
 export { LevelBadge } from "./level-badge";
 export { SearchBar } from "./search-bar";
 export { FilterChips } from "./filter-chips";
+export { WordRow } from "./word-row";

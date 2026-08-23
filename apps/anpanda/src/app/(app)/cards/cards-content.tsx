@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import Link from "next/link";
-import { LevelBadge, SearchBar, FilterChips } from "@/components/ui";
+import { Header } from "@/components/layout";
+import { SearchBar, FilterChips, WordRow } from "@/components/ui";
 
 interface CardItem {
   id: string;
@@ -53,10 +53,11 @@ export function CardsContent({
   return (
     <>
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background flex h-14 items-center justify-between px-page shrink-0">
-        <h1 className="text-lg font-bold text-text-primary">カード一覧</h1>
-        <span className="text-sm text-text-muted">{totalCount}枚</span>
-      </div>
+      <Header
+        variant="page"
+        title="カード一覧"
+        right={<span className="text-sm text-text-muted">{totalCount}枚</span>}
+      />
 
       {/* Body */}
       <div className="flex-1 space-y-4 px-page">
@@ -77,11 +78,9 @@ export function CardsContent({
             カードがありません
           </p>
         ) : (
-          <div className="flex flex-col gap-1.5 pb-4">
+          <div className="flex flex-col gap-2 pb-4">
             {filtered.map((card) => (
-              <div key={card.id} className="glass-card overflow-hidden rounded-card">
-                <CardRow card={card} />
-              </div>
+              <CardRow key={card.id} card={card} />
             ))}
           </div>
         )}
@@ -97,40 +96,26 @@ function CardRow({ card }: { card: CardItem }) {
     (nextReview.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
   );
 
-  let nextLabel: string;
-  let nextColor = "text-text-muted";
+  let nextLabel: string | null = null;
+  let highlight = false;
   if (card.learned) {
-    nextLabel = "";
+    nextLabel = "覚えた";
   } else if (diffDays <= 0) {
-    nextLabel = "次の復習: 今日";
-    nextColor = "text-primary";
+    nextLabel = "次: 今日";
+    highlight = true;
   } else if (diffDays === 1) {
-    nextLabel = "次の復習: 明日";
+    nextLabel = "次: 明日";
   } else {
-    nextLabel = `次の復習: ${diffDays}日後`;
+    nextLabel = `次: ${diffDays}日後`;
   }
 
   return (
-    <Link
-      href={`/cards/${encodeURIComponent(card.word)}`}
-      className="flex items-center justify-between px-4 py-4 min-h-[64px]"
-    >
-      <div className="flex flex-col gap-0.5">
-        <span className="text-[15px] font-medium text-text-primary">
-          {card.word}
-        </span>
-        {card.translation && (
-          <span className="text-xs text-text-muted">{card.translation}</span>
-        )}
-      </div>
-      <div className="flex flex-col items-end gap-0.5">
-        {card.level && <LevelBadge level={Number(card.level)} />}
-        {nextLabel && (
-          <span className={`text-[11px] font-medium ${nextColor}`}>
-            {nextLabel}
-          </span>
-        )}
-      </div>
-    </Link>
+    <WordRow
+      word={card.word}
+      translation={card.translation}
+      level={card.level}
+      rightLabel={nextLabel}
+      rightHighlight={highlight}
+    />
   );
 }

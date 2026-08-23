@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { Download, Upload, ChevronRight, Cloud } from "lucide-react";
+import { Header } from "@/components/layout";
 import { useTheme } from "@/components/theme-provider";
 import { signOut } from "@/lib/supabase/actions";
 import { createClient } from "@/lib/supabase/client";
@@ -162,9 +163,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
   return (
     <>
       {/* Header */}
-      <div className="sticky top-0 z-10 bg-background flex h-14 items-center px-page shrink-0">
-        <h1 className="text-lg font-bold text-text-primary">設定</h1>
-      </div>
+      <Header variant="page" title="設定" />
 
       <div className="flex-1 space-y-6 px-page pb-4">
         {/* Account */}

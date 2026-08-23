@@ -63,7 +63,7 @@ export function ReviewBack({ card }: { card: Flashcard }) {
   return (
     <>
       <div className="flex flex-1 items-center justify-center px-6">
-        <div className="glass-card flex w-full flex-col items-center gap-3 rounded-card-lg p-6">
+        <div className="animate-flip-in glass-card flex w-full flex-col items-center gap-3 rounded-card-lg p-6">
           {/* Word */}
           <span className="font-mono text-[28px] font-bold text-text-primary">
             {card.word}

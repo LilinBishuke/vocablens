@@ -28,11 +28,16 @@ function mapTo3(level: number): number {
 interface LevelBadgeProps {
   level: number;
   showLabel?: boolean;
+  /** ドットの下に Lv.n を縦積み表示（リスト行用） */
+  stacked?: boolean;
 }
 
 /** 難易度表示: 小さな色ドット + 控えめな「Lv.n」表記（難易度は強調しない方針） */
-export function LevelBadge({ level, showLabel = false }: LevelBadgeProps) {
+export function LevelBadge({ level, showLabel = false, stacked = false }: LevelBadgeProps) {
   const { level_system } = useSettings();
+
+  // level が数値でない（null / "B2" 等）カードは表示しない
+  if (!Number.isFinite(level) || level < 1) return null;
 
   let displayLevel: number;
   let style: LevelStyle;
@@ -43,6 +48,17 @@ export function LevelBadge({ level, showLabel = false }: LevelBadgeProps) {
   } else {
     displayLevel = level;
     style = config5[level] ?? config5[3];
+  }
+
+  if (stacked) {
+    return (
+      <span className="inline-flex flex-col items-center gap-1">
+        <span className={`h-[7px] w-[7px] rounded-full ${style.dot}`} />
+        <span className="text-[9px] font-medium leading-none text-text-muted">
+          Lv.{displayLevel}
+        </span>
+      </span>
+    );
   }
 
   return (

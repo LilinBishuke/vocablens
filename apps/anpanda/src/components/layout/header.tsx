@@ -12,6 +12,7 @@ interface HomeHeaderProps {
 interface PageHeaderProps {
   variant: "page";
   title: string;
+  right?: React.ReactNode;
 }
 
 interface DetailHeaderProps {
@@ -35,7 +36,8 @@ type HeaderProps =
 export function Header(props: HeaderProps) {
   const router = useRouter();
 
-  const base = "flex h-14 items-center px-page shrink-0 sticky top-0 z-10 bg-background";
+  const base =
+    "flex h-14 items-center px-page shrink-0 sticky top-0 z-10 bg-gradient-to-b from-background via-background/85 to-transparent";
 
   if (props.variant === "home") {
     return (
@@ -55,6 +57,7 @@ export function Header(props: HeaderProps) {
     return (
       <header className={`${base} justify-between`}>
         <h1 className="text-lg font-bold text-text-primary">{props.title}</h1>
+        {props.right}
       </header>
     );
   }

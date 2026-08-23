@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Header } from "@/components/layout";
 import { useReviewStore } from "@/lib/stores/review-store";
 import type { Flashcard } from "@/lib/types";
 import { ReviewFront } from "./review-front";
@@ -63,15 +64,12 @@ export function ReviewSession({
   return (
     <div className="flex flex-1 flex-col">
       {/* Header */}
-      <ReviewHeader
-        progress={progress}
-        onClose={() => router.push("/")}
-      />
+      <SessionHeader progress={progress} onClose={() => router.push("/")} />
 
       {/* Progress Bar */}
-      <div className="h-2 bg-progress-bar">
+      <div className="mx-page h-1.5 overflow-hidden rounded-chip bg-progress-bar">
         <div
-          className="h-full rounded-progress bg-primary transition-all duration-300"
+          className="h-full rounded-chip bg-primary transition-all duration-300"
           style={{ width: `${progressPercent}%` }}
         />
       </div>
@@ -91,7 +89,7 @@ export function ReviewSession({
   );
 }
 
-function ReviewHeader({
+function SessionHeader({
   progress,
   onClose,
 }: {
@@ -99,30 +97,14 @@ function ReviewHeader({
   onClose: () => void;
 }) {
   const { currentIndex, deck, nextCard } = useReviewStore();
-
+  const canSkip = currentIndex < deck.length - 1;
   return (
-    <header className="flex h-14 items-center justify-between px-page shrink-0 sticky top-0 z-10 bg-background">
-      <button
-        onClick={onClose}
-        className="text-text-muted hover:text-text-secondary transition-colors cursor-pointer"
-        aria-label="閉じる"
-      >
-        <X size={22} strokeWidth={2} />
-      </button>
-      <span className="text-base font-medium text-text-primary">
-        {progress}
-      </span>
-      {currentIndex < deck.length - 1 ? (
-        <button
-          onClick={nextCard}
-          className="text-sm text-text-muted hover:text-text-secondary transition-colors cursor-pointer"
-        >
-          スキップ
-        </button>
-      ) : (
-        <div className="w-[50px]" />
-      )}
-    </header>
+    <Header
+      variant="review"
+      progress={progress}
+      onClose={onClose}
+      onSkip={canSkip ? nextCard : undefined}
+    />
   );
 }
 

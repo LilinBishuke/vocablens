@@ -5,11 +5,11 @@ export interface Flashcard {
   phonetic: string | null;
   translation: string | null;
   definition: {
-    pos: string;
-    meanings: {
-      en: string;
-      ja: string;
-      examples: string[];
+    pos?: string;
+    meanings?: {
+      en?: string;
+      ja?: string;
+      examples?: string[];
     }[];
   } | null;
   synonyms: string[] | null;

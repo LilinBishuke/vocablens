@@ -2,12 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft,
   Volume2,
   Check,
   PlayCircle,
   ExternalLink,
 } from "lucide-react";
+import { Header } from "@/components/layout";
 import { LevelBadge, Button } from "@/components/ui";
 import type { Flashcard } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
@@ -70,16 +70,7 @@ export function CardDetailContent({
   return (
     <div className="flex flex-1 flex-col overflow-y-auto">
       {/* Header */}
-      <header className="flex h-14 items-center gap-3 px-page shrink-0">
-        <button
-          onClick={() => router.back()}
-          className="text-text-primary hover:text-text-secondary transition-colors cursor-pointer"
-          aria-label="戻る"
-        >
-          <ArrowLeft size={22} />
-        </button>
-        <span className="text-base text-text-primary">戻る</span>
-      </header>
+      <Header variant="detail" title="" />
 
       {/* Hero */}
       <div className="bg-gradient-to-b from-primary/15 to-background dark:from-primary/10 dark:to-background px-6 py-5 space-y-2">
@@ -132,17 +123,19 @@ export function CardDetailContent({
             <p className="text-base font-bold text-text-primary">
               {card.definition.pos}
             </p>
-            {card.definition.meanings.map((m, i) => (
+            {(card.definition.meanings ?? []).map((m, i) => (
               <div key={i} className="space-y-1.5">
                 <p className="text-sm font-medium text-text-primary leading-relaxed">
                   {i + 1}. {m.en}
                 </p>
-                <p className="text-[13px] text-text-secondary leading-relaxed">
-                  → {m.ja}
-                </p>
-                {m.examples.length > 0 && (
+                {m.ja && (
+                  <p className="text-[13px] text-text-secondary leading-relaxed">
+                    → {m.ja}
+                  </p>
+                )}
+                {(m.examples?.length ?? 0) > 0 && (
                   <div className="rounded-[10px] bg-primary/10 px-3.5 py-2.5">
-                    {m.examples.map((ex, j) => (
+                    {(m.examples ?? []).map((ex, j) => (
                       <p
                         key={j}
                         className="text-[13px] italic text-text-primary leading-[1.7]"

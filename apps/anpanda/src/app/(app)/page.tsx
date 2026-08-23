@@ -10,21 +10,21 @@ export default async function HomePage() {
 
   if (!user) return null;
 
-  // Auto-create profile if missing (e.g. magic link bypassed /auth/callback)
-  const { data: existingProfile } = await supabase
-    .from("profiles")
-    .select("id")
-    .eq("id", user.id)
-    .single();
-  if (!existingProfile) {
-    await supabase.from("profiles").insert({
-      id: user.id,
-      display_name: user.user_metadata?.full_name ?? user.email?.split("@")[0],
-      avatar_url: user.user_metadata?.avatar_url ?? null,
-      invite_code: "direct",
-    });
-    await supabase.from("user_settings").insert({ user_id: user.id });
-  }
+  // プロフィールが無ければ作成（読み取りせず upsert 1回で済ませる）
+  await Promise.all([
+    supabase.from("profiles").upsert(
+      {
+        id: user.id,
+        display_name: user.user_metadata?.full_name ?? user.email?.split("@")[0],
+        avatar_url: user.user_metadata?.avatar_url ?? null,
+        invite_code: "direct",
+      },
+      { onConflict: "id", ignoreDuplicates: true }
+    ),
+    supabase
+      .from("user_settings")
+      .upsert({ user_id: user.id }, { onConflict: "user_id", ignoreDuplicates: true }),
+  ]);
 
   const [cardsRes, dueRes, learnedRes, historyRes, recentRes, puzzleRes] =
     await Promise.all([

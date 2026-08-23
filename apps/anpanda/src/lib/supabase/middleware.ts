@@ -2,6 +2,20 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
+  // API・静的アセットは認証チェック不要（Supabase往復を省く）
+  const { pathname } = request.nextUrl;
+  if (
+    pathname.startsWith("/api/") ||
+    pathname === "/sw.js" ||
+    pathname === "/manifest.json" ||
+    pathname.startsWith("/icon-") ||
+    pathname.startsWith("/_next/") ||
+    pathname === "/auth/callback" ||
+    pathname === "/auth/reset-password"
+  ) {
+    return NextResponse.next({ request });
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -33,21 +47,7 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
   const isLoginPage = pathname === "/login";
-  const isAuthCallback = pathname === "/auth/callback";
-  const isResetPassword = pathname === "/auth/reset-password";
-  const isApi = pathname.startsWith("/api/");
-  const isStaticPwa =
-    pathname === "/sw.js" ||
-    pathname === "/manifest.json" ||
-    pathname.startsWith("/icon-") ||
-    pathname.startsWith("/_next/");
-
-  // Allow API routes, auth callback, reset-password, and PWA static files
-  if (isApi || isAuthCallback || isResetPassword || isStaticPwa) {
-    return supabaseResponse;
-  }
 
   // Not logged in → redirect to login
   if (!user && !isLoginPage) {

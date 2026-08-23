@@ -138,10 +138,9 @@ body {
 }
 
 /* ── Safe area for bottom tab bar ── */
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
+.pb-safe {
+  /* ホームバー分の余白。セーフエリアが無い環境でも最低20pxを確保する */
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom, 1.25rem));
 }
 
 /* ── Scrollbar hide for filter chips ── */
@@ -151,6 +150,39 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ── カードフリップ・ページ遷移 ── */
+@keyframes flip-in {
+  0% { transform: perspective(900px) rotateY(-70deg); opacity: 0; }
+  100% { transform: perspective(900px) rotateY(0deg); opacity: 1; }
+}
+.animate-flip-in {
+  animation: flip-in 0.28s ease-out;
+  transform-style: preserve-3d;
+}
+@keyframes page-in {
+  0% { transform: translateY(4px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+.animate-page-in {
+  animation: page-in 0.2s ease-out;
+}
+@keyframes sheet-in {
+  0% { transform: translateY(24px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+.animate-sheet-in {
+  animation: sheet-in 0.24s ease-out;
+}
+
+/* ── Reduced motion: 全アニメーションを無効化 ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ── Puzzle complete celebration ── */

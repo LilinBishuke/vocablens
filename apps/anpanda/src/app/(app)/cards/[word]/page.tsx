@@ -8,7 +8,12 @@ export default async function CardDetailPage({
   params: Promise<{ word: string }>;
 }) {
   const { word } = await params;
-  const decodedWord = decodeURIComponent(word);
+  let decodedWord: string;
+  try {
+    decodedWord = decodeURIComponent(word);
+  } catch {
+    notFound();
+  }
   const supabase = await createClient();
 
   const {

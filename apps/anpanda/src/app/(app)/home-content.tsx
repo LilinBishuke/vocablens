@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Play, Sparkles } from "lucide-react";
-import { LevelBadge } from "@/components/ui";
+import { WordRow } from "@/components/ui";
 import type { UserStats } from "@/lib/types";
 
 interface RecentWord {
@@ -115,23 +115,12 @@ export function HomeContent({
         ) : (
           <div className="flex flex-col gap-1.5">
             {recentWords.map((w) => (
-              <Link
+              <WordRow
                 key={w.id}
-                href={`/cards/${encodeURIComponent(w.word)}`}
-                className="flex items-center justify-between glass-card rounded-card px-4 py-3 min-h-[56px]"
-              >
-                <span className="text-[15px] font-medium text-text-primary">
-                  {w.word}
-                </span>
-                <div className="flex items-center gap-2">
-                  {w.translation && (
-                    <span className="text-xs text-text-muted">
-                      {w.translation}
-                    </span>
-                  )}
-                  {w.level && <LevelBadge level={Number(w.level)} />}
-                </div>
-              </Link>
+                word={w.word}
+                translation={w.translation}
+                level={w.level}
+              />
             ))}
           </div>
         )}
