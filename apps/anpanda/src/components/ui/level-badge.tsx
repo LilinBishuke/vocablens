@@ -34,9 +34,10 @@ interface LevelBadgeProps {
 
 /** 難易度表示: 小さな色ドット + 控えめな「Lv.n」表記（難易度は強調しない方針） */
 export function LevelBadge({ level, showLabel = false, stacked = false }: LevelBadgeProps) {
-  const { level_system } = useSettings();
+  const { level_system, show_level } = useSettings();
 
-  // level が数値でない（null / "B2" 等）カードは表示しない
+  // 設定で難易度表示オフ、または level が数値でないカードは表示しない
+  if (!show_level) return null;
   if (!Number.isFinite(level) || level < 1) return null;
 
   let displayLevel: number;

@@ -2,6 +2,7 @@
 
 import { Volume2 } from "lucide-react";
 import { useReviewStore } from "@/lib/stores/review-store";
+import { speakWord } from "@/lib/utils/speak";
 import { calculateSM2 } from "@/lib/utils/sm2";
 import { createClient } from "@/lib/supabase/client";
 import { LevelBadge } from "@/components/ui";
@@ -12,9 +13,7 @@ export function ReviewBack({ card }: { card: Flashcard }) {
   const { rateCard, nextCard } = useReviewStore();
 
   function handleSpeak() {
-    const utterance = new SpeechSynthesisUtterance(card.word);
-    utterance.lang = "en-US";
-    speechSynthesis.speak(utterance);
+    speakWord(card.word);
   }
 
   function handleRate(rating: FaceRatingEntry) {

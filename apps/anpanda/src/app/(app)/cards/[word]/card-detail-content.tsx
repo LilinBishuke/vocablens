@@ -7,6 +7,7 @@ import { Header } from "@/components/layout";
 import { LevelBadge, Button } from "@/components/ui";
 import type { Flashcard } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
+import { speakWord } from "@/lib/utils/speak";
 import { AddToFolderSheet } from "@/components/add-to-folder-sheet";
 
 interface CardDetailContentProps {
@@ -75,9 +76,7 @@ export function CardDetailContent({
   }
 
   function handleSpeak() {
-    const utterance = new SpeechSynthesisUtterance(card.word);
-    utterance.lang = "en-US";
-    speechSynthesis.speak(utterance);
+    speakWord(card.word);
   }
 
   const nextReview = new Date(card.sm2_next_review);
@@ -148,7 +147,10 @@ export function CardDetailContent({
             AI取得が未設定のため、一部の情報を表示できません
           </p>
         )}
-        {enrichError && <p className="text-xs text-again">{enrichError}</p>}
+        {/* コンテンツが空のときだけエラーを見せる（既に情報があるなら静かに） */}
+        {enrichError && !card.translation && meanings.length === 0 && (
+          <p className="text-xs text-again">{enrichError}</p>
+        )}
 
         {/* 意味 */}
         {(card.translation || meanings.length > 0) && (

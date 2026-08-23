@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { Volume2 } from "lucide-react";
 import { useReviewStore } from "@/lib/stores/review-store";
+import { speakWord } from "@/lib/utils/speak";
 import { useSettings } from "@/lib/contexts/settings-context";
 import { LevelBadge } from "@/components/ui";
 import type { Flashcard } from "@/lib/types";
@@ -12,9 +13,7 @@ export function ReviewFront({ card }: { card: Flashcard }) {
   const { auto_play_audio } = useSettings();
 
   function speak() {
-    const u = new SpeechSynthesisUtterance(card.word);
-    u.lang = "en-US";
-    speechSynthesis.speak(u);
+    speakWord(card.word);
   }
 
   useEffect(() => {

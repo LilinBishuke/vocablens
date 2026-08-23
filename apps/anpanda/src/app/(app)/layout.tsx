@@ -12,7 +12,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     const [settingsRes, dueRes] = await Promise.all([
       supabase
         .from("user_settings")
-        .select("level_system, auto_play_audio, translation_lang")
+        .select("level_system, auto_play_audio, translation_lang, show_level")
         .eq("user_id", user.id)
         .single(),
       supabase
@@ -23,7 +23,17 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         .eq("learned", false)
         .lte("sm2_next_review", new Date().toISOString()),
     ]);
-    settings = settingsRes.data ?? {};
+    if (settingsRes.data) {
+      settings = settingsRes.data;
+    } else {
+      // show_level 列が未追加の環境向けフォールバック
+      const { data: fallback } = await supabase
+        .from("user_settings")
+        .select("level_system, auto_play_audio, translation_lang")
+        .eq("user_id", user.id)
+        .single();
+      settings = fallback ?? {};
+    }
     dueCount = dueRes.count ?? 0;
   }
 

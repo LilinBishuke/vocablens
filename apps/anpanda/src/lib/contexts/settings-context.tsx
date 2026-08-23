@@ -6,12 +6,14 @@ interface AppSettings {
   level_system: string;
   auto_play_audio: boolean;
   translation_lang: string;
+  show_level: boolean;
 }
 
 const defaults: AppSettings = {
   level_system: "5",
   auto_play_audio: true,
   translation_lang: "ja",
+  show_level: true,
 };
 
 const SettingsContext = createContext<AppSettings>(defaults);

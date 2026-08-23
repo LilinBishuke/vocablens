@@ -4,8 +4,15 @@ import { createClient } from "@/lib/supabase/server";
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-const GEMINI_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+// キー形式でエンドポイントを切替:
+// - AIza...  → AI Studio (generativelanguage.googleapis.com)
+// - AQ.xxx   → Vertex AI express mode (aiplatform.googleapis.com)
+function geminiUrl(apiKey: string): string {
+  if (apiKey.startsWith("AQ.")) {
+    return "https://aiplatform.googleapis.com/v1/publishers/google/models/gemini-2.5-flash:generateContent";
+  }
+  return "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
+}
 
 interface EnrichPayload {
   level: number | null;
@@ -37,22 +44,33 @@ function buildPrompt(word: string): string {
 }
 
 async function callGemini(word: string, apiKey: string): Promise<EnrichPayload | null> {
-  const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+  const res = await fetch(geminiUrl(apiKey), {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": apiKey,
+    },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: buildPrompt(word) }] }],
+      contents: [{ role: "user", parts: [{ text: buildPrompt(word) }] }],
       generationConfig: {
         responseMimeType: "application/json",
         temperature: 0.2,
+        thinkingConfig: { thinkingBudget: 0 },
       },
     }),
-    signal: AbortSignal.timeout(20000),
+    signal: AbortSignal.timeout(25000),
   });
-  if (!res.ok) return null;
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => "");
+    console.error(`[enrich] gemini ${res.status} for "${word}": ${errBody.slice(0, 500)}`);
+    return null;
+  }
   const data = await res.json();
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) return null;
+  if (!text) {
+    console.error(`[enrich] empty candidates for "${word}": ${JSON.stringify(data).slice(0, 400)}`);
+    return null;
+  }
   try {
     const p = JSON.parse(text);
     return {
@@ -89,7 +107,8 @@ async function callGemini(word: string, apiKey: string): Promise<EnrichPayload |
         : [],
       phonetic: typeof p.phonetic === "string" ? p.phonetic : null,
     };
-  } catch {
+  } catch (e) {
+    console.error(`[enrich] JSON parse failed for "${word}": ${String(e)} :: ${text.slice(0, 300)}`);
     return null;
   }
 }

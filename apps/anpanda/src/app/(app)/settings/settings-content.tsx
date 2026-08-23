@@ -17,6 +17,7 @@ interface UserSettings {
   reminder_enabled: boolean;
   reminder_time: string;
   auto_play_audio: boolean;
+  show_level: boolean;
 }
 
 interface Props {
@@ -89,6 +90,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
     reminder_enabled: false,
     reminder_time: "20:00",
     auto_play_audio: true,
+    show_level: true,
   };
 
   const [s, setS] = useState<UserSettings>({ ...defaults, ...settings });
@@ -209,46 +211,18 @@ export function SettingsContent({ email, settings, userId }: Props) {
       <Header variant="page" title="設定" />
 
       <div className="flex-1 space-y-6 px-page pb-4">
-        {/* Account */}
-        <SettingsSection label="アカウント">
-          <div className="flex items-center justify-between glass-card rounded-button px-4 py-4">
-            <span className="text-sm text-text-primary">{email}</span>
-            <button
-              onClick={() => signOut()}
-              className="text-[13px] font-medium text-again cursor-pointer"
-            >
-              ログアウト
-            </button>
-          </div>
-        </SettingsSection>
+        {/* プロフィール */}
+        <div className="glass-card flex items-center gap-3.5 rounded-card px-4 py-4">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-base font-bold text-on-primary">
+            {email.charAt(0).toUpperCase()}
+          </span>
+          <span className="min-w-0 flex-1 truncate text-sm font-medium text-text-primary">
+            {email}
+          </span>
+        </div>
 
-        {/* Display */}
-        <SettingsSection label="表示設定">
-          <SettingsCard>
-            <SettingsRow
-              label="テーマ"
-              value={themeLabels[theme] ?? "システム"}
-              onClick={cycleTheme}
-            />
-            <Divider />
-            <SettingsPickerRow
-              label="翻訳言語"
-              value={s.translation_lang}
-              options={langOptions}
-              onSelect={(v) => updateSetting("translation_lang", v)}
-            />
-            <Divider />
-            <SettingsPickerRow
-              label="分類システム"
-              value={s.level_system}
-              options={levelSystemOptions}
-              onSelect={(v) => updateSetting("level_system", v)}
-            />
-          </SettingsCard>
-        </SettingsSection>
-
-        {/* Review */}
-        <SettingsSection label="復習設定">
+        {/* 学習 */}
+        <SettingsSection label="学習">
           <SettingsCard>
             <SettingsPickerRow
               label="1日の上限"
@@ -300,8 +274,39 @@ export function SettingsContent({ email, settings, userId }: Props) {
           </SettingsCard>
         </SettingsSection>
 
+        {/* 表示 */}
+        <SettingsSection label="表示">
+          <SettingsCard>
+            <SettingsToggleRow
+              label="難易度の表示"
+              enabled={s.show_level}
+              onToggle={(v) => updateSetting("show_level", v)}
+            />
+            <Divider />
+            <SettingsRow
+              label="テーマ"
+              value={themeLabels[theme] ?? "システム"}
+              onClick={cycleTheme}
+            />
+            <Divider />
+            <SettingsPickerRow
+              label="翻訳言語"
+              value={s.translation_lang}
+              options={langOptions}
+              onSelect={(v) => updateSetting("translation_lang", v)}
+            />
+            <Divider />
+            <SettingsPickerRow
+              label="レベル表記"
+              value={s.level_system}
+              options={levelSystemOptions}
+              onSelect={(v) => updateSetting("level_system", v)}
+            />
+          </SettingsCard>
+        </SettingsSection>
+
         {/* Data */}
-        <SettingsSection label="データ">
+        <SettingsSection label="連携・データ">
           <SettingsCard>
             <button
               onClick={handleBulkEnrich}
@@ -375,6 +380,23 @@ export function SettingsContent({ email, settings, userId }: Props) {
               {importStatus === "トークンをコピーしました" && (
                 <span className="text-[13px] font-medium text-good">コピー済み ✓</span>
               )}
+            </button>
+          </SettingsCard>
+        </SettingsSection>
+
+        {/* その他 */}
+        <SettingsSection label="その他">
+          <SettingsCard>
+            <div className="flex items-center justify-between px-4 py-3.5">
+              <span className="text-sm text-text-primary">バージョン情報</span>
+              <span className="text-[13px] text-text-muted">1.4.0</span>
+            </div>
+            <Divider />
+            <button
+              onClick={() => signOut()}
+              className="flex w-full items-center px-4 py-3.5 cursor-pointer"
+            >
+              <span className="text-sm font-medium text-again">ログアウト</span>
             </button>
           </SettingsCard>
         </SettingsSection>
