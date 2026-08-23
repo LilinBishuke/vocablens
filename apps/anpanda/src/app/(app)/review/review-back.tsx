@@ -68,8 +68,17 @@ export function ReviewBack({ card }: { card: Flashcard }) {
 
   return (
     <>
-      <div className="flex flex-1 items-start justify-center overflow-y-auto px-6 py-3">
-        <div className="animate-flip-in glass-card flex w-full flex-col items-center gap-3 rounded-card-lg px-6 py-6">
+      <div className="flex flex-1 flex-col px-6 pt-3">
+        <div className="relative">
+          <div
+            className="absolute inset-x-4 top-3 bottom-[-10px] rounded-card-lg bg-surface/50"
+            style={{ transform: "rotate(-3deg)" }}
+            aria-hidden
+          />
+          <div
+            className="animate-flip-in glass-card relative flex w-full flex-col items-center gap-3 overflow-y-auto rounded-card-lg px-6 py-6"
+            style={{ height: "min(440px, 52dvh)" }}
+          >
           {/* Lv */}
           {card.level && <LevelBadge level={Number(card.level)} showLabel />}
 
@@ -154,6 +163,7 @@ export function ReviewBack({ card }: { card: Flashcard }) {
           )}
           {/* スラング */}
           {def?.slang && <InfoBlock label="スラング・口語" text={def.slang} />}
+          </div>
         </div>
       </div>
 
