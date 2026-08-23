@@ -65,7 +65,7 @@ export function CardsContent({
       {/* Body */}
       <div className="flex-1 space-y-4 px-page">
         <SearchBar
-          placeholder="検索..."
+          placeholder="単語を検索..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />

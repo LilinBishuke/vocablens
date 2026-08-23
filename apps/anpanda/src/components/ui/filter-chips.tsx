@@ -15,10 +15,10 @@ export function FilterChips({ items, activeIndex, onChange }: FilterChipsProps) 
           <button
             key={item}
             onClick={() => onChange(i)}
-            className={`shrink-0 rounded-chip px-3.5 py-2 text-sm font-medium transition-colors cursor-pointer ${
+            className={`shrink-0 rounded-chip px-3.5 py-[7px] text-xs font-medium transition-all active:scale-95 cursor-pointer ${
               isActive
                 ? "bg-primary text-on-primary"
-                : "bg-surface border border-surface-border text-text-secondary hover:bg-surface-border/30"
+                : "glass-card text-text-secondary hover:text-text-primary"
             }`}
           >
             {item}
