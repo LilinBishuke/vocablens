@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Play, Sparkles } from "lucide-react";
 import { WordRow } from "@/components/ui";
+import { AddWordFab } from "@/components/add-word-fab";
 import type { UserStats } from "@/lib/types";
 
 interface RecentWord {
@@ -96,12 +97,17 @@ export function HomeContent({
         </div>
       </div>
 
-      {/* Stat Chips */}
-      <div className="flex items-start gap-2">
+      {/* Stat Chips → 学習サマリーへ */}
+      <Link
+        href="/summary"
+        className="flex items-center gap-2 rounded-card px-1 py-1 transition-all active:scale-[0.98]"
+        aria-label="学習サマリーを見る"
+      >
         <StatChip value={String(stats.learnedCount)} label="覚えた" />
         <StatChip value={`${stats.accuracyPercent}%`} label="正解率" />
         <StatChip value={String(stats.totalCards)} label="カード" />
-      </div>
+        <span className="text-text-muted" aria-hidden>›</span>
+      </Link>
 
       {/* Recent Words */}
       <div className="space-y-2.5">
@@ -125,6 +131,8 @@ export function HomeContent({
           </div>
         )}
       </div>
+
+      <AddWordFab />
     </div>
   );
 }

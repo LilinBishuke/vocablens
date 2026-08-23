@@ -3,8 +3,9 @@
 import { useState, useMemo } from "react";
 import { Header } from "@/components/layout";
 import { SearchBar, FilterChips, WordRow } from "@/components/ui";
+import { GroupsView } from "./groups-view";
 
-interface CardItem {
+export interface CardItem {
   id: string;
   word: string;
   translation: string | null;
@@ -12,9 +13,11 @@ interface CardItem {
   learned: boolean;
   sm2_next_review: string;
   created_at: string;
+  source_title?: string | null;
+  source_type?: string | null;
 }
 
-const FILTERS = ["全て", "復習待ち", "覚えた"];
+const FILTERS = ["全て", "グループ", "復習待ち", "覚えた"];
 
 export function CardsContent({
   cards,
@@ -29,11 +32,11 @@ export function CardsContent({
   const filtered = useMemo(() => {
     let list = cards;
 
-    // Filter
-    if (filterIndex === 1) {
+    // Filter（1=グループは別ビュー）
+    if (filterIndex === 2) {
       const now = new Date().toISOString();
       list = list.filter((c) => !c.learned && c.sm2_next_review <= now);
-    } else if (filterIndex === 2) {
+    } else if (filterIndex === 3) {
       list = list.filter((c) => c.learned);
     }
 
@@ -73,7 +76,9 @@ export function CardsContent({
           onChange={setFilterIndex}
         />
 
-        {filtered.length === 0 ? (
+        {filterIndex === 1 ? (
+          <GroupsView cards={cards} />
+        ) : filtered.length === 0 ? (
           <p className="py-8 text-center text-sm text-text-muted">
             カードがありません
           </p>

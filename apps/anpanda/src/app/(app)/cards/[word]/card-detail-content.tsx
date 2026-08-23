@@ -1,16 +1,19 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import {
   Volume2,
   Check,
   PlayCircle,
   ExternalLink,
+  Sparkles,
 } from "lucide-react";
 import { Header } from "@/components/layout";
 import { LevelBadge, Button } from "@/components/ui";
 import type { Flashcard } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
+import { AddToFolderSheet } from "@/components/add-to-folder-sheet";
 
 const levelLabels: Record<string, string> = {
   "1": "初級",
@@ -32,6 +35,41 @@ export function CardDetailContent({
   accuracy,
 }: CardDetailContentProps) {
   const router = useRouter();
+  const [enriching, setEnriching] = useState(false);
+  const [enrichError, setEnrichError] = useState("");
+
+  const missingInfo = !card.translation || !card.definition || !card.phonetic;
+
+  async function handleEnrich() {
+    setEnriching(true);
+    setEnrichError("");
+    try {
+      const res = await fetch(
+        `/api/dictionary?word=${encodeURIComponent(card.word)}`
+      );
+      if (!res.ok) throw new Error();
+      const d = await res.json();
+      if (!d.found && !d.translation) {
+        setEnrichError("辞書に見つかりませんでした");
+        setEnriching(false);
+        return;
+      }
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("flashcards")
+        .update({
+          phonetic: card.phonetic ?? d.phonetic,
+          translation: card.translation ?? d.translation,
+          definition: card.definition ?? d.definition,
+        })
+        .eq("id", card.id);
+      if (error) throw error;
+      router.refresh();
+    } catch {
+      setEnrichError("取得に失敗しました。もう一度お試しください");
+    }
+    setEnriching(false);
+  }
 
   async function handleDelete() {
     if (!confirm("このカードを削除しますか？")) return;
@@ -108,6 +146,23 @@ export function CardDetailContent({
 
       {/* Body */}
       <div className="space-y-5 px-6 py-6">
+        {/* 情報補完 */}
+        {missingInfo && (
+          <div className="space-y-2">
+            <button
+              onClick={handleEnrich}
+              disabled={enriching}
+              className="glass-card flex h-11 w-full items-center justify-center gap-2 rounded-button text-sm font-medium text-primary transition-all active:scale-[0.97] disabled:opacity-50 cursor-pointer"
+            >
+              <Sparkles size={16} />
+              {enriching ? "取得中..." : "意味・発音を自動取得"}
+            </button>
+            {enrichError && (
+              <p className="text-xs text-again">{enrichError}</p>
+            )}
+          </div>
+        )}
+
         {/* Translation */}
         {card.translation && (
           <Section label="翻訳">
@@ -160,6 +215,9 @@ export function CardDetailContent({
         )}
 
         <Separator />
+
+        {/* フォルダ */}
+        <AddToFolderSheet cardId={card.id} />
 
         {/* Learning Record */}
         <div className="space-y-2.5">
