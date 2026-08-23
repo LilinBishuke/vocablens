@@ -33,6 +33,7 @@ export default function LoginPage() {
   function switchTab(t: Tab) {
     setTab(t);
     setError("");
+    setLoading(false);
   }
 
   // --- Login ---
@@ -59,8 +60,10 @@ export default function LoginPage() {
     if (error) {
       setError("メールアドレスまたはパスワードが正しくありません");
       setLoading(false);
+      return;
     }
-    // On success, middleware redirects to /
+    // 成功: 明示的にホームへ遷移（セッションCookieを持ってフルリロード）
+    window.location.assign("/");
   }
 
   async function handleGoogleLogin() {
