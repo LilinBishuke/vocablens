@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/layout";
+import { useT } from "@/lib/contexts/settings-context";
 import { useReviewStore } from "@/lib/stores/review-store";
 import type { Flashcard } from "@/lib/types";
 import { ReviewFront } from "./review-front";
@@ -17,6 +18,7 @@ export function ReviewSession({
   initialCards: Flashcard[];
 }) {
   const router = useRouter();
+  const t = useT();
   const { deck, startSession, isComplete, isFlipped, mode, currentIndex } =
     useReviewStore();
 
@@ -34,16 +36,16 @@ export function ReviewSession({
           🎉
         </div>
         <p className="text-lg font-semibold text-text-primary">
-          復習する単語がありません
+          {t("review.noCards")}
         </p>
         <p className="text-sm text-text-secondary text-center">
-          新しい単語を追加するか、明日また来てください
+          {t("review.comeBack")}
         </p>
         <button
           onClick={() => router.push("/")}
           className="mt-2 rounded-button bg-primary px-6 py-3 text-sm font-semibold text-on-primary shadow-button-glow cursor-pointer"
         >
-          ホームに戻る
+          {t("common.backHome")}
         </button>
       </div>
     );
@@ -109,6 +111,7 @@ function SessionHeader({
 }
 
 function ModeTabs() {
+  const t = useT();
   const { mode, switchMode } = useReviewStore();
 
   return (
@@ -122,7 +125,7 @@ function ModeTabs() {
               : "text-text-muted hover:text-text-secondary"
           }`}
         >
-          カード
+          {t("review.card")}
         </button>
         <button
           onClick={() => switchMode("writing")}
@@ -132,7 +135,7 @@ function ModeTabs() {
               : "text-text-muted hover:text-text-secondary"
           }`}
         >
-          ライティング
+          {t("review.writing")}
         </button>
       </div>
     </div>

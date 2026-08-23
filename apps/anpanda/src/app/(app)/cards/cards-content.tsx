@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { Header } from "@/components/layout";
 import { SearchBar, FilterChips, WordRow } from "@/components/ui";
+import { useT } from "@/lib/contexts/settings-context";
 import { GroupsView } from "./groups-view";
 
 export interface CardItem {
@@ -17,7 +18,7 @@ export interface CardItem {
   source_type?: string | null;
 }
 
-const FILTERS = ["全て", "グループ", "復習待ち", "覚えた"];
+
 
 export function CardsContent({
   cards,
@@ -26,6 +27,8 @@ export function CardsContent({
   cards: CardItem[];
   totalCount: number;
 }) {
+  const t = useT();
+  const FILTERS = [t("cards.all"), t("cards.groups"), t("cards.due"), t("cards.learned")];
   const [search, setSearch] = useState("");
   const [filterIndex, setFilterIndex] = useState(0);
 
@@ -58,14 +61,14 @@ export function CardsContent({
       {/* Header */}
       <Header
         variant="page"
-        title="カード一覧"
-        right={<span className="text-sm text-text-muted">{totalCount}枚</span>}
+        title={t("cards.title")}
+        right={<span className="text-sm text-text-muted">{totalCount}{t("common.cardsUnit")}</span>}
       />
 
       {/* Body */}
       <div className="flex-1 space-y-4 px-page">
         <SearchBar
-          placeholder="単語を検索..."
+          placeholder={t("cards.search")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -80,12 +83,12 @@ export function CardsContent({
           <GroupsView cards={cards} />
         ) : filtered.length === 0 ? (
           <p className="py-8 text-center text-sm text-text-muted">
-            カードがありません
+            {t("cards.empty")}
           </p>
         ) : (
           <div className="flex flex-col gap-2 pb-4">
             {filtered.map((card) => (
-              <CardRow key={card.id} card={card} />
+              <CardRow key={card.id} card={card} t={t} />
             ))}
           </div>
         )}
@@ -94,7 +97,7 @@ export function CardsContent({
   );
 }
 
-function CardRow({ card }: { card: CardItem }) {
+function CardRow({ card, t }: { card: CardItem; t: ReturnType<typeof useT> }) {
   const nextReview = new Date(card.sm2_next_review);
   const now = new Date();
   const diffDays = Math.ceil(
@@ -104,14 +107,14 @@ function CardRow({ card }: { card: CardItem }) {
   let nextLabel: string | null = null;
   let highlight = false;
   if (card.learned) {
-    nextLabel = "覚えた";
+    nextLabel = t("cards.learned");
   } else if (diffDays <= 0) {
-    nextLabel = "次: 今日";
+    nextLabel = t("cards.nextToday");
     highlight = true;
   } else if (diffDays === 1) {
-    nextLabel = "次: 明日";
+    nextLabel = t("cards.nextTomorrow");
   } else {
-    nextLabel = `次: ${diffDays}日後`;
+    nextLabel = t("cards.nextDays", { n: diffDays });
   }
 
   return (

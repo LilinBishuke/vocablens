@@ -9,6 +9,7 @@ import type { Flashcard } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
 import { speakWord } from "@/lib/utils/speak";
 import { AddToFolderSheet } from "@/components/add-to-folder-sheet";
+import { useT } from "@/lib/contexts/settings-context";
 
 interface CardDetailContentProps {
   card: Flashcard;
@@ -22,6 +23,7 @@ export function CardDetailContent({
   accuracy,
 }: CardDetailContentProps) {
   const router = useRouter();
+  const t = useT();
   const [enriching, setEnriching] = useState(false);
   const [aiUnavailable, setAiUnavailable] = useState(false);
   const [enrichError, setEnrichError] = useState("");
@@ -84,7 +86,11 @@ export function CardDetailContent({
     (nextReview.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
   );
   const nextLabel =
-    diffDays <= 0 ? "今日" : diffDays === 1 ? "明日" : `${diffDays}日後`;
+    diffDays <= 0
+      ? t("detail.today")
+      : diffDays === 1
+        ? t("detail.tomorrow")
+        : t("detail.daysLater", { n: diffDays });
 
   const meanings = (def?.meanings ?? []).filter((m) => m.en && m.en.trim());
   const examples: { en: string; ja?: string }[] = (def?.examples ?? []).filter(
@@ -138,7 +144,7 @@ export function CardDetailContent({
           <div className="glass-card flex items-center gap-2.5 rounded-button px-4 py-3">
             <Sparkles size={16} className="animate-pulse text-primary" />
             <span className="text-[13px] text-text-secondary">
-              AIが語源・文法・例文を生成しています...
+              {t("detail.generating")}
             </span>
           </div>
         )}
@@ -155,7 +161,7 @@ export function CardDetailContent({
         {/* 意味 */}
         {(card.translation || meanings.length > 0) && (
           <section className="space-y-2">
-            <SectionLabel>意味</SectionLabel>
+            <SectionLabel>{t("detail.meaning")}</SectionLabel>
             {card.translation && (
               <p className="text-lg font-semibold text-text-primary">
                 {card.translation}
@@ -187,14 +193,14 @@ export function CardDetailContent({
         )}
 
         {/* 語源 / 文法 / スラング */}
-        {def?.etymology && <InfoCard label="語源" text={def.etymology} />}
-        {def?.grammar && <InfoCard label="文法・使い方" text={def.grammar} />}
-        {def?.slang && <InfoCard label="スラング・口語" text={def.slang} />}
+        {def?.etymology && <InfoCard label={t("review.etymology")} text={def.etymology} />}
+        {def?.grammar && <InfoCard label={t("review.grammar")} text={def.grammar} />}
+        {def?.slang && <InfoCard label={t("review.slang")} text={def.slang} />}
 
         {/* 例文 */}
         {allExamples.length > 0 && (
           <section className="space-y-2">
-            <SectionLabel>例文</SectionLabel>
+            <SectionLabel>{t("review.examples")}</SectionLabel>
             <div className="rounded-[14px] bg-primary/10 px-4 py-3 space-y-2.5">
               {allExamples.map((ex, i) => (
                 <div key={i}>
@@ -215,7 +221,7 @@ export function CardDetailContent({
         {/* 類語 */}
         {card.synonyms && card.synonyms.length > 0 && (
           <p className="text-[13px] text-text-muted">
-            類語:{" "}
+            {t("detail.synonyms")}:{" "}
             <span className="text-text-primary">
               {card.synonyms.join(", ")}
             </span>
@@ -227,15 +233,15 @@ export function CardDetailContent({
 
         {/* 学習記録（コンパクト 2×2） */}
         <section className="space-y-2">
-          <SectionLabel>学習記録</SectionLabel>
+          <SectionLabel>{t("detail.record")}</SectionLabel>
           <div className="grid grid-cols-2 gap-2">
             <MiniStat
-              label="追加日"
+              label={t("detail.addedOn")}
               value={new Date(card.created_at).toLocaleDateString("ja-JP")}
             />
-            <MiniStat label="復習回数" value={`${reviewCount}回`} />
-            <MiniStat label="正解率" value={`${accuracy}%`} />
-            <MiniStat label="次の復習" value={nextLabel} highlight />
+            <MiniStat label={t("detail.reviews")} value={`${reviewCount}`} />
+            <MiniStat label={t("home.accuracy")} value={`${accuracy}%`} />
+            <MiniStat label={t("detail.nextReview")} value={nextLabel} highlight />
           </div>
         </section>
 
@@ -270,7 +276,7 @@ export function CardDetailContent({
 
         {/* Delete */}
         <Button variant="danger" className="w-full" onClick={handleDelete}>
-          カードを削除
+          {t("detail.delete")}
         </Button>
       </div>
     </div>

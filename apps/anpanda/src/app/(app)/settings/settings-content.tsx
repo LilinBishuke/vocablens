@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { Download, Upload, ChevronRight, Cloud, Sparkles } from "lucide-react";
 import { Header } from "@/components/layout";
+import { useT } from "@/lib/contexts/settings-context";
 import { useTheme } from "@/components/theme-provider";
 import { signOut } from "@/lib/supabase/actions";
 import { createClient } from "@/lib/supabase/client";
@@ -18,6 +19,7 @@ interface UserSettings {
   reminder_time: string;
   auto_play_audio: boolean;
   show_level: boolean;
+  display_lang?: string;
 }
 
 interface Props {
@@ -26,14 +28,16 @@ interface Props {
   userId: string;
 }
 
-const themeLabels: Record<string, string> = {
-  system: "システム",
-  light: "ライト",
-  dark: "ダーク",
-};
+
 
 export function SettingsContent({ email, settings, userId }: Props) {
   const router = useRouter();
+  const t = useT();
+  const themeLabels: Record<string, string> = {
+    system: t("settings.themeSystem"),
+    light: t("settings.themeLight"),
+    dark: t("settings.themeDark"),
+  };
   const { theme, setTheme } = useTheme();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importStatus, setImportStatus] = useState<string | null>(null);
@@ -91,6 +95,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
     reminder_time: "20:00",
     auto_play_audio: true,
     show_level: true,
+    display_lang: "ja",
   };
 
   const [s, setS] = useState<UserSettings>({ ...defaults, ...settings });
@@ -208,7 +213,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
   return (
     <>
       {/* Header */}
-      <Header variant="page" title="設定" />
+      <Header variant="page" title={t("settings.title")} />
 
       <div className="flex-1 space-y-6 px-page pb-4">
         {/* プロフィール */}
@@ -222,24 +227,24 @@ export function SettingsContent({ email, settings, userId }: Props) {
         </div>
 
         {/* 学習 */}
-        <SettingsSection label="学習">
+        <SettingsSection label={t("settings.study")}>
           <SettingsCard>
             <SettingsPickerRow
-              label="1日の上限"
+              label={t("settings.dailyLimit")}
               value={String(s.daily_limit)}
               options={dailyLimitOptions}
               onSelect={(v) => updateSetting("daily_limit", Number(v))}
             />
             <Divider />
             <SettingsPickerRow
-              label="新規カード"
+              label={t("settings.newCards")}
               value={String(s.new_cards_per_day)}
               options={newCardsOptions}
               onSelect={(v) => updateSetting("new_cards_per_day", Number(v))}
             />
             <Divider />
             <SettingsToggleRow
-              label="リマインダー"
+              label={t("settings.reminder")}
               enabled={s.reminder_enabled}
               onToggle={async (v) => {
                 if (v && "Notification" in window) {
@@ -267,7 +272,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
             )}
             <Divider />
             <SettingsToggleRow
-              label="音声自動再生"
+              label={t("settings.autoAudio")}
               enabled={s.auto_play_audio}
               onToggle={(v) => updateSetting("auto_play_audio", v)}
             />
@@ -275,29 +280,40 @@ export function SettingsContent({ email, settings, userId }: Props) {
         </SettingsSection>
 
         {/* 表示 */}
-        <SettingsSection label="表示">
+        <SettingsSection label={t("settings.display")}>
           <SettingsCard>
+            <SettingsPickerRow
+              label={t("settings.displayLang")}
+              value={s.display_lang ?? "ja"}
+              options={[
+                { label: "日本語", value: "ja" },
+                { label: "English", value: "en" },
+                { label: "中文", value: "zh" },
+              ]}
+              onSelect={(v) => updateSetting("display_lang", v)}
+            />
+            <Divider />
             <SettingsToggleRow
-              label="難易度の表示"
+              label={t("settings.showLevel")}
               enabled={s.show_level}
               onToggle={(v) => updateSetting("show_level", v)}
             />
             <Divider />
             <SettingsRow
-              label="テーマ"
+              label={t("settings.theme")}
               value={themeLabels[theme] ?? "システム"}
               onClick={cycleTheme}
             />
             <Divider />
             <SettingsPickerRow
-              label="翻訳言語"
+              label={t("settings.translationLang")}
               value={s.translation_lang}
               options={langOptions}
               onSelect={(v) => updateSetting("translation_lang", v)}
             />
             <Divider />
             <SettingsPickerRow
-              label="レベル表記"
+              label={t("settings.levelSystem")}
               value={s.level_system}
               options={levelSystemOptions}
               onSelect={(v) => updateSetting("level_system", v)}
@@ -306,7 +322,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
         </SettingsSection>
 
         {/* Data */}
-        <SettingsSection label="連携・データ">
+        <SettingsSection label={t("settings.integration")}>
           <SettingsCard>
             <button
               onClick={handleBulkEnrich}
@@ -316,7 +332,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
               <div className="flex items-center gap-3">
                 <Sparkles size={18} className="text-primary" />
                 <span className="text-sm text-text-primary">
-                  不足情報をAIで一括取得
+                  {t("settings.bulkEnrich")}
                 </span>
               </div>
               {bulkStatus && (
@@ -331,7 +347,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
             >
               <Download size={18} className="text-text-muted" />
               <span className="text-sm text-text-primary">
-                {exportLoading ? "エクスポート中..." : "エクスポート（CSV）"}
+                {exportLoading ? "..." : t("settings.export")}
               </span>
             </button>
             <Divider />
@@ -385,10 +401,10 @@ export function SettingsContent({ email, settings, userId }: Props) {
         </SettingsSection>
 
         {/* その他 */}
-        <SettingsSection label="その他">
+        <SettingsSection label={t("settings.other")}>
           <SettingsCard>
             <div className="flex items-center justify-between px-4 py-3.5">
-              <span className="text-sm text-text-primary">バージョン情報</span>
+              <span className="text-sm text-text-primary">{t("settings.version")}</span>
               <span className="text-[13px] text-text-muted">1.4.0</span>
             </div>
             <Divider />
@@ -396,7 +412,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
               onClick={() => signOut()}
               className="flex w-full items-center px-4 py-3.5 cursor-pointer"
             >
-              <span className="text-sm font-medium text-again">ログアウト</span>
+              <span className="text-sm font-medium text-again">{t("settings.logout")}</span>
             </button>
           </SettingsCard>
         </SettingsSection>

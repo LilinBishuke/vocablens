@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { Header } from "@/components/layout";
 import { SummaryContent } from "./summary-content";
+import { getT, normalizeLang } from "@/lib/i18n";
 
 export default async function SummaryPage() {
   const supabase = await createClient();
@@ -9,7 +10,7 @@ export default async function SummaryPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [historyRes, cardsRes] = await Promise.all([
+  const [historyRes, cardsRes, langRes] = await Promise.all([
     supabase
       .from("review_history")
       .select("reviewed_at, is_correct")
@@ -21,7 +22,13 @@ export default async function SummaryPage() {
       .select("level, source_title, source_type, learned")
       .eq("user_id", user.id)
       .is("deleted_at", null),
+    supabase
+      .from("user_settings")
+      .select("display_lang")
+      .eq("user_id", user.id)
+      .single(),
   ]);
+  const t = getT(normalizeLang(langRes.data?.display_lang));
 
   const history = historyRes.data ?? [];
   const cards = cardsRes.data ?? [];
@@ -84,7 +91,7 @@ export default async function SummaryPage() {
 
   return (
     <>
-      <Header variant="detail" title="学習サマリー" />
+      <Header variant="detail" title={t("summary.title")} />
       <SummaryContent
         streak={streak}
         weekly={weekly}

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Volume2 } from "lucide-react";
 import { useReviewStore } from "@/lib/stores/review-store";
 import { speakWord } from "@/lib/utils/speak";
-import { useSettings } from "@/lib/contexts/settings-context";
+import { useSettings, useT } from "@/lib/contexts/settings-context";
 import { LevelBadge } from "@/components/ui";
 import { FaceRating } from "@/components/ui/face-rating";
 import type { Flashcard } from "@/lib/types";
@@ -12,6 +12,7 @@ import type { Flashcard } from "@/lib/types";
 export function ReviewFront({ card }: { card: Flashcard }) {
   const { flipCard } = useReviewStore();
   const { auto_play_audio } = useSettings();
+  const t = useT();
 
   function speak() {
     speakWord(card.word);
@@ -64,7 +65,7 @@ export function ReviewFront({ card }: { card: Flashcard }) {
               <Volume2 size={18} className="text-primary" />
             </button>
             <span className="pt-3 text-sm text-text-muted">
-              タップして答えを見る
+              {t("review.tapToReveal")}
             </span>
           </div>
         </div>
@@ -72,7 +73,7 @@ export function ReviewFront({ card }: { card: Flashcard }) {
 
       {/* 評価エリアの場所だけ確保（フリップ後と同じ高さ・非表示） */}
       <div className="invisible shrink-0 space-y-3 px-page pb-7 pt-2" aria-hidden>
-        <p className="text-center text-[11px]">覚えていましたか？</p>
+        <p className="text-center text-[11px]">{t("review.remembered")}</p>
         <FaceRating onRate={() => {}} disabled />
       </div>
     </>

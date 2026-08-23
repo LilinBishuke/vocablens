@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Search, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useT } from "@/lib/contexts/settings-context";
 
 interface LookupResult {
   word: string;
@@ -19,6 +20,7 @@ interface LookupResult {
 /** ホーム右下のフローティング＋ボタンと単語追加シート */
 export function AddWordFab() {
   const router = useRouter();
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [looking, setLooking] = useState(false);
@@ -142,7 +144,7 @@ export function AddWordFab() {
             <div className="mx-auto mb-4 h-1 w-9 rounded-full bg-text-muted/40" />
             <div className="mb-1 flex items-center justify-between">
               <h2 className="text-[17px] font-semibold text-text-primary">
-                単語を追加
+                {t("home.addWord")}
               </h2>
               <button
                 onClick={() => setOpen(false)}

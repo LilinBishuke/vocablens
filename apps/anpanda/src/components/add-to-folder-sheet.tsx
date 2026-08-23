@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Folder, Check, Plus, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useT } from "@/lib/contexts/settings-context";
 
 interface FolderItem {
   id: string;
@@ -12,6 +13,7 @@ interface FolderItem {
 
 /** カード詳細の「フォルダに追加」行 + チェックリストシート */
 export function AddToFolderSheet({ cardId }: { cardId: string }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [folders, setFolders] = useState<FolderItem[] | null>(null);
   const [unavailable, setUnavailable] = useState(false);
@@ -103,7 +105,7 @@ export function AddToFolderSheet({ cardId }: { cardId: string }) {
       >
         <Folder size={18} className="shrink-0 text-primary" />
         <span className="flex-1 text-left text-sm font-medium text-text-primary">
-          フォルダに追加
+          {t("detail.addToFolder")}
         </span>
         {memberCount != null && memberCount > 0 && (
           <span className="text-xs text-text-secondary">{memberCount}件</span>
@@ -122,7 +124,7 @@ export function AddToFolderSheet({ cardId }: { cardId: string }) {
             <div className="mx-auto mb-4 h-1 w-9 rounded-full bg-text-muted/40" />
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-[17px] font-semibold text-text-primary">
-                フォルダに追加
+                {t("detail.addToFolder")}
               </h2>
               <button
                 onClick={() => setOpen(false)}
@@ -192,7 +194,7 @@ export function AddToFolderSheet({ cardId }: { cardId: string }) {
               onClick={() => setOpen(false)}
               className="mt-4 flex h-12 w-full items-center justify-center rounded-button bg-primary text-[15px] font-semibold text-on-primary shadow-button-glow transition-all active:scale-[0.97] cursor-pointer"
             >
-              完了
+              {t("common.done")}
             </button>
           </div>
         </div>

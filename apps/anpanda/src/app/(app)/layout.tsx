@@ -12,7 +12,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     const [settingsRes, dueRes] = await Promise.all([
       supabase
         .from("user_settings")
-        .select("level_system, auto_play_audio, translation_lang, show_level")
+        .select("level_system, auto_play_audio, translation_lang, show_level, display_lang")
         .eq("user_id", user.id)
         .single(),
       supabase

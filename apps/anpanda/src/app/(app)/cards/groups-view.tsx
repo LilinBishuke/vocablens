@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Folder, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { CardItem } from "./cards-content";
+import { useT } from "@/lib/contexts/settings-context";
 
 export interface FolderRow {
   id: string;
@@ -14,6 +15,7 @@ export interface FolderRow {
 
 /** グループビュー: マイフォルダ + 出典から（自動） */
 export function GroupsView({ cards }: { cards: CardItem[] }) {
+  const t = useT();
   const [folders, setFolders] = useState<FolderRow[] | null>(null);
   const [unavailable, setUnavailable] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -78,7 +80,7 @@ export function GroupsView({ cards }: { cards: CardItem[] }) {
       {/* マイフォルダ */}
       <div className="space-y-2.5">
         <h2 className="text-xs font-semibold text-text-secondary">
-          マイフォルダ
+          {t("cards.myFolders")}
         </h2>
         {unavailable && (
           <p className="glass-card rounded-card px-4 py-3 text-xs text-text-secondary">
@@ -101,7 +103,7 @@ export function GroupsView({ cards }: { cards: CardItem[] }) {
               <span className="block truncate text-[15px] font-medium text-text-primary">
                 {f.name}
               </span>
-              <span className="text-xs text-text-secondary">{f.count}枚</span>
+              <span className="text-xs text-text-secondary">{f.count}{t("common.cardsUnit")}</span>
             </span>
             <span className="text-text-muted" aria-hidden>›</span>
           </Link>
@@ -114,7 +116,7 @@ export function GroupsView({ cards }: { cards: CardItem[] }) {
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-                placeholder="フォルダ名"
+                placeholder={t("cards.folderName")}
                 className="h-10 min-w-0 flex-1 rounded-[10px] bg-surface px-3 text-sm text-text-primary placeholder:text-text-muted outline-none"
               />
               <button
@@ -122,7 +124,7 @@ export function GroupsView({ cards }: { cards: CardItem[] }) {
                 disabled={saving || !newName.trim()}
                 className="h-10 shrink-0 rounded-[10px] bg-primary px-4 text-[13px] font-semibold text-on-primary disabled:opacity-40 cursor-pointer"
               >
-                作成
+                {t("cards.create")}
               </button>
             </div>
           ) : (
@@ -131,7 +133,7 @@ export function GroupsView({ cards }: { cards: CardItem[] }) {
               className="flex w-full items-center justify-center gap-1.5 rounded-card border-[1.5px] border-dashed border-surface-border py-3 text-[13px] font-medium text-text-secondary transition-colors hover:text-text-primary cursor-pointer"
             >
               <Plus size={15} />
-              新しいフォルダ
+              {t("cards.newFolder")}
             </button>
           ))}
       </div>
@@ -139,7 +141,7 @@ export function GroupsView({ cards }: { cards: CardItem[] }) {
       {/* 出典から（自動） */}
       <div className="space-y-2.5">
         <h2 className="text-xs font-semibold text-text-secondary">
-          出典から（自動）
+          {t("cards.fromSources")}
         </h2>
         {sources.map(([title, info]) => (
           <Link

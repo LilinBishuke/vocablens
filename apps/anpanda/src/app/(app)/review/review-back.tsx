@@ -3,6 +3,7 @@
 import { Volume2 } from "lucide-react";
 import { useReviewStore } from "@/lib/stores/review-store";
 import { speakWord } from "@/lib/utils/speak";
+import { useT } from "@/lib/contexts/settings-context";
 import { calculateSM2 } from "@/lib/utils/sm2";
 import { createClient } from "@/lib/supabase/client";
 import { LevelBadge } from "@/components/ui";
@@ -11,6 +12,7 @@ import type { Flashcard } from "@/lib/types";
 
 export function ReviewBack({ card }: { card: Flashcard }) {
   const { rateCard, nextCard } = useReviewStore();
+  const t = useT();
 
   function handleSpeak() {
     speakWord(card.word);
@@ -136,7 +138,7 @@ export function ReviewBack({ card }: { card: Flashcard }) {
           {allExamples.length > 0 && (
             <div className="w-full rounded-[14px] bg-primary/10 px-4 py-3 text-left">
               <p className="text-[10px] font-semibold text-primary-strong">
-                例文
+                {t("review.examples")}
               </p>
               {allExamples.slice(0, 2).map((ex, i) => (
                 <div key={i} className={i > 0 ? "mt-2" : "mt-1"}>
@@ -155,14 +157,14 @@ export function ReviewBack({ card }: { card: Flashcard }) {
 
           {/* 語源 */}
           {def?.etymology && (
-            <InfoBlock label="語源" text={def.etymology} />
+            <InfoBlock label={t("review.etymology")} text={def.etymology} />
           )}
           {/* 文法・使い方 */}
           {def?.grammar && (
-            <InfoBlock label="文法・使い方" text={def.grammar} />
+            <InfoBlock label={t("review.grammar")} text={def.grammar} />
           )}
           {/* スラング */}
-          {def?.slang && <InfoBlock label="スラング・口語" text={def.slang} />}
+          {def?.slang && <InfoBlock label={t("review.slang")} text={def.slang} />}
           </div>
         </div>
       </div>
@@ -170,7 +172,7 @@ export function ReviewBack({ card }: { card: Flashcard }) {
       {/* Bottom: 5段階フェイス評価 */}
       <div className="shrink-0 space-y-3 px-page pb-7 pt-2">
         <p className="text-center text-[11px] text-text-muted">
-          覚えていましたか？
+          {t("review.remembered")}
         </p>
         <FaceRating onRate={handleRate} />
       </div>

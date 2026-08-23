@@ -1,3 +1,7 @@
+"use client";
+
+import { useT } from "@/lib/contexts/settings-context";
+
 const LEVEL_DOTS = [
   "bg-level-1",
   "bg-level-2",
@@ -27,6 +31,7 @@ export function SummaryContent({
   levelCounts,
   topSources,
 }: Props) {
+  const t = useT();
   const maxWeekly = Math.max(1, ...weekly.map((w) => w.count));
   const levelTotal = levelCounts.reduce((s, n) => s + n, 0);
 
@@ -39,13 +44,11 @@ export function SummaryContent({
             {streak}
           </span>
           <span className="text-sm font-medium text-text-primary">
-            日連続で学習中
+            {t("summary.streakSuffix")}
           </span>
         </div>
         <p className="mt-2 text-xs text-text-muted">
-          {streak > 0
-            ? "この調子で続けましょう"
-            : "今日の復習からストリークを始めましょう"}
+          {streak > 0 ? t("summary.keepGoing") : t("summary.startToday")}
         </p>
       </div>
 
@@ -53,10 +56,10 @@ export function SummaryContent({
       <div className="glass-card rounded-card-lg p-5">
         <div className="flex items-baseline justify-between">
           <h2 className="text-[13px] font-semibold text-text-primary">
-            今週の復習
+            {t("summary.thisWeek")}
           </h2>
           <span className="text-[13px] font-semibold text-primary">
-            {weekTotal}枚
+            {weekTotal}{t("common.cardsUnit")}
           </span>
         </div>
         <div className="mt-4 flex items-end justify-between gap-2">
@@ -77,9 +80,9 @@ export function SummaryContent({
       {/* 累計 */}
       <div className="flex gap-2.5">
         {[
-          [String(total), "カード"],
-          [String(learned), "覚えた"],
-          [`${accuracy}%`, "正解率"],
+          [String(total), t("home.cards")],
+          [String(learned), t("home.learned")],
+          [`${accuracy}%`, t("home.accuracy")],
         ].map(([v, l]) => (
           <div
             key={l}
@@ -95,7 +98,7 @@ export function SummaryContent({
       {levelTotal > 0 && (
         <div className="glass-card rounded-card-lg p-5">
           <h2 className="text-[13px] font-semibold text-text-primary">
-            難易度の内訳
+            {t("summary.levelDist")}
           </h2>
           <div className="mt-3 flex h-2.5 overflow-hidden rounded-chip">
             {levelCounts.map(
@@ -130,7 +133,7 @@ export function SummaryContent({
       {topSources.length > 0 && (
         <div className="glass-card rounded-card-lg p-5">
           <h2 className="text-[13px] font-semibold text-text-primary">
-            よく学んでいる出典
+            {t("summary.topSources")}
           </h2>
           <div className="mt-3 space-y-2.5">
             {topSources.map(([title, count]) => (
@@ -140,7 +143,7 @@ export function SummaryContent({
                   {title}
                 </span>
                 <span className="shrink-0 text-[11px] text-text-muted">
-                  {count}枚
+                  {count}{t("common.cardsUnit")}
                 </span>
               </div>
             ))}
