@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { Volume2 } from "lucide-react";
 import { useReviewStore } from "@/lib/stores/review-store";
 import { useSettings } from "@/lib/contexts/settings-context";
 import { LevelBadge } from "@/components/ui";
@@ -10,17 +11,20 @@ export function ReviewFront({ card }: { card: Flashcard }) {
   const { flipCard } = useReviewStore();
   const { auto_play_audio } = useSettings();
 
+  function speak() {
+    const u = new SpeechSynthesisUtterance(card.word);
+    u.lang = "en-US";
+    speechSynthesis.speak(u);
+  }
+
   useEffect(() => {
     if (!auto_play_audio) return;
-    const t = setTimeout(() => {
-      const u = new SpeechSynthesisUtterance(card.word);
-      u.lang = "en-US";
-      speechSynthesis.speak(u);
-    }, 400);
+    const t = setTimeout(speak, 400);
     return () => {
       clearTimeout(t);
       speechSynthesis.cancel();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [card.word, auto_play_audio]);
 
   return (
@@ -32,9 +36,12 @@ export function ReviewFront({ card }: { card: Flashcard }) {
           style={{ transform: "rotate(-3deg)" }}
           aria-hidden
         />
-        <button
+        <div
           onClick={flipCard}
-          className="animate-flip-in glass-card relative flex w-full flex-col items-center justify-center gap-5 rounded-card-lg p-8 cursor-pointer transition-transform active:scale-[0.99]"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && flipCard()}
+          className="animate-flip-in glass-card relative flex w-full flex-col items-center justify-center gap-4 rounded-card-lg p-8 cursor-pointer transition-transform active:scale-[0.99]"
           style={{ minHeight: 340 }}
           aria-label="タップして答えを見る"
         >
@@ -45,10 +52,20 @@ export function ReviewFront({ card }: { card: Flashcard }) {
           {card.phonetic && (
             <span className="text-[15px] text-text-muted">{card.phonetic}</span>
           )}
-          <span className="pt-4 text-sm text-text-muted">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              speak();
+            }}
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 cursor-pointer"
+            aria-label="発音を再生"
+          >
+            <Volume2 size={18} className="text-primary" />
+          </button>
+          <span className="pt-3 text-sm text-text-muted">
             タップして答えを見る
           </span>
-        </button>
+        </div>
       </div>
     </div>
   );

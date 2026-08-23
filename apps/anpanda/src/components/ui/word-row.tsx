@@ -26,7 +26,7 @@ export function WordRow({
   return (
     <Link
       href={`/cards/${encodeURIComponent(word)}`}
-      className="glass-card flex min-h-[60px] items-center gap-3 rounded-card px-4 py-3 transition-all duration-150 active:scale-[0.98] hover:border-primary/25"
+      className="glass-card flex min-h-[67px] items-center gap-3 rounded-card py-[15px] pl-[18px] pr-4 transition-all duration-150 active:scale-[0.98] hover:border-primary/25"
     >
       {Number.isFinite(levelNum) && (
         <span className="flex w-7 shrink-0 flex-col items-center">
@@ -34,7 +34,7 @@ export function WordRow({
         </span>
       )}
       <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="truncate text-[15px] font-semibold text-text-primary">
+        <span className="truncate text-base font-semibold text-text-primary">
           {word}
         </span>
         {translation && (
@@ -45,7 +45,7 @@ export function WordRow({
       </span>
       {rightLabel && (
         <span
-          className={`shrink-0 text-[11px] font-medium ${
+          className={`shrink-0 text-[10px] font-medium ${
             rightHighlight ? "text-primary" : "text-text-muted"
           }`}
         >

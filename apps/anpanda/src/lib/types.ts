@@ -11,6 +11,14 @@ export interface Flashcard {
       ja?: string;
       examples?: string[];
     }[];
+    /** 語源（Gemini生成） */
+    etymology?: string;
+    /** 文法・使い方（Gemini生成） */
+    grammar?: string;
+    /** スラング・口語用法（あれば） */
+    slang?: string;
+    /** 例文（英+訳） */
+    examples?: { en: string; ja?: string }[];
   } | null;
   synonyms: string[] | null;
   level: string | null;

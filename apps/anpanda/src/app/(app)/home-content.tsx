@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Play, Sparkles } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { WordRow } from "@/components/ui";
 import { AddWordFab } from "@/components/add-word-fab";
 import type { UserStats } from "@/lib/types";
@@ -26,92 +26,77 @@ interface HomeContentProps {
   activePuzzle: ActivePuzzle | null;
 }
 
+/** created_at からの相対時刻ラベル */
+function relativeTime(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const min = Math.floor(diffMs / 60000);
+  if (min < 1) return "たった今";
+  if (min < 60) return `${min}分前`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `${h}時間前`;
+  const d = Math.floor(h / 24);
+  if (d < 30) return `${d}日前`;
+  const mo = Math.floor(d / 30);
+  if (mo < 12) return `${mo}ヶ月前`;
+  return `${Math.floor(mo / 12)}年前`;
+}
+
 export function HomeContent({
   stats,
   recentWords,
   activePuzzle,
 }: HomeContentProps) {
   return (
-    <div className="flex-1 space-y-4 overflow-y-auto px-page py-5">
-      {/* Puzzle Preview */}
-      {activePuzzle && (
-        <div className="space-y-2.5">
-          <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-text-primary">
-              パズル
-            </h2>
-            <Link
-              href="/puzzle"
-              className="text-[13px] text-primary"
-            >
-              詳細 →
-            </Link>
-          </div>
-          <Link
-            href="/puzzle"
-            className="flex items-center gap-3 rounded-card border border-surface-border bg-surface p-3.5"
-          >
-            <div className="flex-1 min-w-0">
-              <span className="text-xs font-medium text-text-primary">
-                {activePuzzle.name}
-              </span>
-            </div>
-            <span className="text-xs font-semibold text-primary">
-              {activePuzzle.piecesRevealed} / {activePuzzle.totalPieces}
-            </span>
-          </Link>
-        </div>
-      )}
-
-      {/* Hero Card */}
-      <div className="relative overflow-hidden rounded-card-lg bg-gradient-to-br from-hero-from to-hero-to p-0">
-        {/* Decorative */}
-        <div className="absolute right-3 -top-2.5 h-[50px] w-[50px] rounded-full bg-white/6" />
-        <div className="absolute -left-4 bottom-2 h-[70px] w-[70px] rounded-full bg-white/5" />
-        <Sparkles
-          size={14}
-          className="absolute left-[190px] top-3 text-white/15"
-        />
-
-        <div className="relative p-5">
-          <p className="text-[13px] text-white/80">今日の復習</p>
-          <p className="mt-1 text-[30px] font-bold text-white">
-            {stats.dueCount}枚
-          </p>
-
-          <div className="mt-4 flex items-center justify-between">
-            <Link
-              href="/review"
-              className="inline-flex h-[34px] items-center justify-center rounded-chip bg-white px-5 text-xs font-semibold text-hero-to"
-            >
-              復習を始める
-            </Link>
-            <Link
-              href="/review"
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20"
-              aria-label="復習を始める"
-            >
-              <Play size={22} className="text-white" />
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Stat Chips → 学習サマリーへ */}
+    <div className="flex-1 space-y-[18px] px-page pb-6 pt-1">
+      {/* 統計行（グループ化・学習サマリーへ） */}
       <Link
         href="/summary"
-        className="flex items-center gap-2 rounded-card px-1 py-1 transition-all active:scale-[0.98]"
+        className="glass-card flex items-center gap-1 rounded-card px-3 py-2.5 transition-all active:scale-[0.98]"
         aria-label="学習サマリーを見る"
       >
         <StatChip value={String(stats.learnedCount)} label="覚えた" />
         <StatChip value={`${stats.accuracyPercent}%`} label="正解率" />
         <StatChip value={String(stats.totalCards)} label="カード" />
-        <span className="text-text-muted" aria-hidden>›</span>
+        <ChevronRight size={16} className="shrink-0 text-text-muted" />
       </Link>
+
+      {/* 今日 */}
+      <div className="space-y-2">
+        <h2 className="text-[13px] font-semibold text-text-secondary">今日</h2>
+        <div className="rounded-card-lg bg-gradient-to-br from-hero-from to-hero-to p-[22px]">
+          <p className="text-[13px] font-medium text-white/85">今日の復習</p>
+          <div className="mt-3 flex items-center justify-between gap-3.5">
+            <p className="text-[30px] font-bold leading-none text-white">
+              {stats.dueCount}枚
+            </p>
+            <Link
+              href="/review"
+              className="inline-flex shrink-0 items-center justify-center rounded-chip bg-white px-[18px] py-2.5 text-[13px] font-semibold text-hero-to transition-transform active:scale-95"
+            >
+              復習を始める
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* パズル */}
+      {activePuzzle && (
+        <Link
+          href="/puzzle"
+          className="glass-card flex items-center gap-3 rounded-card px-4 py-3 transition-all active:scale-[0.98]"
+        >
+          <span className="min-w-0 flex-1 truncate text-xs font-medium text-text-primary">
+            パズル: {activePuzzle.name}
+          </span>
+          <span className="shrink-0 text-xs font-semibold text-primary">
+            {activePuzzle.piecesRevealed} / {activePuzzle.totalPieces}
+          </span>
+        </Link>
+      )}
 
       {/* Recent Words */}
       <div className="space-y-2.5">
-        <h2 className="text-base font-semibold text-text-primary">
+        <h2 className="text-[13px] font-semibold text-text-secondary">
           最近追加した単語
         </h2>
         {recentWords.length === 0 ? (
@@ -119,13 +104,14 @@ export function HomeContent({
             まだ単語がありません
           </p>
         ) : (
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             {recentWords.map((w) => (
               <WordRow
                 key={w.id}
                 word={w.word}
                 translation={w.translation}
                 level={w.level}
+                rightLabel={relativeTime(w.created_at)}
               />
             ))}
           </div>
@@ -137,20 +123,12 @@ export function HomeContent({
   );
 }
 
-function StatChip({
-  value,
-  label,
-  valueColor = "text-text-primary",
-}: {
-  value: string;
-  label: string;
-  valueColor?: string;
-}) {
+function StatChip({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex flex-1 flex-col items-center gap-0.5">
       <div className="flex items-center gap-1.5">
         <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-        <span className={`text-[17px] font-bold ${valueColor}`}>{value}</span>
+        <span className="text-[17px] font-bold text-text-primary">{value}</span>
       </div>
       <span className="text-[10px] text-text-muted">{label}</span>
     </div>

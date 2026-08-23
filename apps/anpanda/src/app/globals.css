@@ -116,9 +116,9 @@
 body {
   background-color: var(--color-background);
   background-image:
-    radial-gradient(340px 340px at -8% -4%, var(--blob-a), transparent 70%),
-    radial-gradient(300px 300px at 108% 32%, var(--blob-b), transparent 70%),
-    radial-gradient(320px 320px at 30% 88%, var(--blob-a), transparent 70%);
+    radial-gradient(340px 340px at 19% 11%, var(--blob-a), transparent 70%),
+    radial-gradient(300px 300px at 93% 28%, var(--blob-b), transparent 70%),
+    radial-gradient(330px 330px at 48% 66%, var(--blob-a), transparent 70%);
   background-attachment: fixed;
   color: var(--color-text-primary);
   font-family: var(--font-sans);

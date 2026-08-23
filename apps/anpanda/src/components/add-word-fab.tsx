@@ -111,7 +111,7 @@ export function AddWordFab() {
           setOpen(true);
         }}
         aria-label="単語を追加"
-        className="fixed bottom-28 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-on-primary shadow-button-glow transition-transform active:scale-90 cursor-pointer"
+        className="fixed bottom-24 right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-on-primary shadow-button-glow transition-transform active:scale-90 cursor-pointer"
       >
         <Plus size={26} strokeWidth={2.2} />
       </button>
