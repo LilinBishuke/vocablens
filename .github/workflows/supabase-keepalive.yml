@@ -15,6 +15,6 @@ jobs:
         run: |
           code=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlqdm93bHhqaG9oeGxodG91dGFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1OTIyOTQsImV4cCI6MjA5MDE2ODI5NH0.f3F4rMEStr5D-4sFXRtbNixMIWOispgXJCeolIywNps" \
-            "https://yjvowlxjhohxlhtoutab.supabase.co/rest/v1/?select=1")
+            "https://yjvowlxjhohxlhtoutab.supabase.co/rest/v1/puzzles?select=id&limit=1")
           echo "HTTP $code"
           [ "$code" = "200" ] || exit 1
