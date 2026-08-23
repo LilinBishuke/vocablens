@@ -196,7 +196,7 @@ export default function LoginPage() {
 
       {/* Segmented tab control */}
       <div className="px-8 pt-6 pb-2">
-        <div className="flex rounded-full bg-surface-border/40 p-1">
+        <div className="glass-card flex rounded-full p-1">
           {(["login", "signup"] as const).map((t) => (
             <button
               key={t}
@@ -204,7 +204,7 @@ export default function LoginPage() {
               className={`flex-1 py-2 rounded-full text-sm font-semibold transition-all cursor-pointer ${
                 tab === t
                   ? "bg-primary text-on-primary shadow-sm"
-                  : "text-text-muted"
+                  : "text-text-secondary hover:text-text-primary"
               }`}
             >
               {t === "login" ? "ログイン" : "新規登録"}
