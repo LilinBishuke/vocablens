@@ -26,6 +26,7 @@ export function AddWordFab() {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [savedWord, setSavedWord] = useState("");
+  const [generating, setGenerating] = useState(false);
 
   function reset() {
     setInput("");
@@ -93,10 +94,23 @@ export function AddWordFab() {
       setSaving(false);
       return;
     }
-    setSavedWord(result.word);
     setSaving(false);
     setResult(null);
     setInput("");
+
+    // AIで語源・文法・例文まで自動生成（キー未設定時は静かにスキップ）
+    setGenerating(true);
+    try {
+      await fetch("/api/enrich", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ word: result.word }),
+      });
+    } catch {
+      // 生成失敗でもカード自体は保存済み
+    }
+    setGenerating(false);
+    setSavedWord(result.word);
     router.refresh();
   }
 
@@ -171,6 +185,11 @@ export function AddWordFab() {
             {error && <p className="mt-3 text-xs text-again">{error}</p>}
             {looking && (
               <p className="mt-3 text-xs text-text-muted">検索中...</p>
+            )}
+            {generating && (
+              <p className="mt-3 rounded-button bg-primary/10 px-3 py-2.5 text-[13px] text-text-secondary">
+                AIが意味・語源・例文を生成しています...
+              </p>
             )}
             {savedWord && (
               <p className="mt-3 rounded-button bg-primary/10 px-3 py-2.5 text-[13px] font-medium text-primary-strong">

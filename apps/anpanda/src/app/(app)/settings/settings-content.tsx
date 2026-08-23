@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
-import { Download, Upload, ChevronRight, Cloud } from "lucide-react";
+import { Download, Upload, ChevronRight, Cloud, Sparkles } from "lucide-react";
 import { Header } from "@/components/layout";
 import { useTheme } from "@/components/theme-provider";
 import { signOut } from "@/lib/supabase/actions";
@@ -36,6 +36,49 @@ export function SettingsContent({ email, settings, userId }: Props) {
   const { theme, setTheme } = useTheme();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importStatus, setImportStatus] = useState<string | null>(null);
+  const [bulkStatus, setBulkStatus] = useState<string | null>(null);
+
+  async function handleBulkEnrich() {
+    if (bulkStatus) return;
+    setBulkStatus("対象を確認中...");
+    const supabase = createClient();
+    const { data: cards } = await supabase
+      .from("flashcards")
+      .select("word, translation, level, definition")
+      .eq("user_id", userId)
+      .is("deleted_at", null);
+    const targets = (cards ?? []).filter((c) => {
+      const d = c.definition as { etymology?: string } | null;
+      return !d?.etymology || !c.translation || !Number.isFinite(Number(c.level));
+    });
+    if (targets.length === 0) {
+      setBulkStatus("すべて取得済みです");
+      setTimeout(() => setBulkStatus(null), 3000);
+      return;
+    }
+    let done = 0;
+    for (const t of targets) {
+      setBulkStatus(`生成中 ${done + 1}/${targets.length}...`);
+      try {
+        const res = await fetch("/api/enrich", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ word: t.word }),
+        });
+        if (res.status === 501) {
+          setBulkStatus("AI取得が未設定です");
+          setTimeout(() => setBulkStatus(null), 4000);
+          return;
+        }
+      } catch {
+        // 個別失敗はスキップして続行
+      }
+      done++;
+    }
+    setBulkStatus(`完了（${done}枚）`);
+    router.refresh();
+    setTimeout(() => setBulkStatus(null), 4000);
+  }
 
   const defaults: UserSettings = {
     theme: "system",
@@ -260,6 +303,22 @@ export function SettingsContent({ email, settings, userId }: Props) {
         {/* Data */}
         <SettingsSection label="データ">
           <SettingsCard>
+            <button
+              onClick={handleBulkEnrich}
+              disabled={Boolean(bulkStatus)}
+              className="flex w-full items-center justify-between px-4 py-3.5 cursor-pointer disabled:opacity-60"
+            >
+              <div className="flex items-center gap-3">
+                <Sparkles size={18} className="text-primary" />
+                <span className="text-sm text-text-primary">
+                  不足情報をAIで一括取得
+                </span>
+              </div>
+              {bulkStatus && (
+                <span className="text-[13px] text-text-secondary">{bulkStatus}</span>
+              )}
+            </button>
+            <Divider />
             <button
               onClick={handleExport}
               disabled={exportLoading}
