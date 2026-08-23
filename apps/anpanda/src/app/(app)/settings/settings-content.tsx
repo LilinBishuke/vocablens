@@ -127,13 +127,23 @@ export function SettingsContent({ email, settings, userId }: Props) {
     { label: "5段階", value: "5" },
   ];
 
-  function updateSetting(key: string, value: unknown) {
+  async function updateSetting(key: string, value: unknown) {
     setS((prev) => ({ ...prev, [key]: value }));
     const supabase = createClient();
-    supabase
+    const { error } = await supabase
       .from("user_settings")
       .update({ [key]: value })
       .eq("user_id", userId);
+    if (error) {
+      alert(
+        "設定を保存できませんでした。データベースの更新（SQL実行）が必要な可能性があります"
+      );
+      return;
+    }
+    // 表示に影響する設定は即時反映（レイアウトの設定コンテキストを再取得）
+    if (key === "display_lang" || key === "show_level" || key === "level_system") {
+      router.refresh();
+    }
   }
 
   function cycleTheme() {
