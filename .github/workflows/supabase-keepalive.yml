@@ -1,0 +1,20 @@
+name: Supabase keep-alive
+
+# 無料プランの自動休止（7日間非アクティブ）を防ぐため、週2回 API を叩く。
+# 使用キーは anon（公開ロール・クライアントバンドルに含まれる公開値）のみ。
+on:
+  schedule:
+    - cron: "0 21 * * 1,4" # 月・木 06:00 JST
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Anpanda Supabase REST API
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlqdm93bHhqaG9oeGxodG91dGFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1OTIyOTQsImV4cCI6MjA5MDE2ODI5NH0.f3F4rMEStr5D-4sFXRtbNixMIWOispgXJCeolIywNps" \
+            "https://yjvowlxjhohxlhtoutab.supabase.co/rest/v1/?select=1")
+          echo "HTTP $code"
+          [ "$code" = "200" ] || exit 1
