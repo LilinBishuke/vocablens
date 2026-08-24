@@ -38,7 +38,9 @@ export function FilterChips({
   }
 
   return (
-    <div className="flex gap-2 overflow-x-auto no-scrollbar">
+    // overflow-x-auto がチップの影をクリップするため、影の分（上4px/下20px/左右20px）を
+    // パディングで確保し、同量のネガティブマージンで見た目の間隔を維持する
+    <div className="-mx-page -mt-1 -mb-1 flex gap-2 overflow-x-auto no-scrollbar px-page pt-1 pb-5">
       {items.map((item, i) => {
         const isActive = i === activeIndex;
         return (
