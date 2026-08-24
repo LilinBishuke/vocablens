@@ -17,6 +17,8 @@ interface LookupResult {
   } | null;
 }
 
+type CardType = "vocab" | "idiom" | "slang";
+
 /** ホーム右下のフローティング＋ボタンと単語追加シート */
 export function AddWordFab() {
   const router = useRouter();
@@ -29,6 +31,13 @@ export function AddWordFab() {
   const [saving, setSaving] = useState(false);
   const [savedWord, setSavedWord] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [cardType, setCardType] = useState<CardType>("vocab");
+
+  const TYPE_OPTIONS: { value: CardType; label: string }[] = [
+    { value: "vocab", label: t("cards.typeVocab") },
+    { value: "idiom", label: t("cards.typeIdiom") },
+    { value: "slang", label: t("cards.typeSlang") },
+  ];
 
   function reset() {
     setInput("");
@@ -37,6 +46,7 @@ export function AddWordFab() {
     setLooking(false);
     setSaving(false);
     setSavedWord("");
+    setCardType("vocab");
   }
 
   async function handleLookup() {
@@ -85,7 +95,7 @@ export function AddWordFab() {
         phonetic: result.phonetic,
         translation: result.translation,
         definition: result.definition,
-        type: "vocab",
+        type: cardType,
         source_type: null,
         source_title: "手動で追加",
       },
@@ -224,6 +234,29 @@ export function AddWordFab() {
                     </p>
                   )}
                 </div>
+
+                {/* 種類（vocab / idiom / slang） */}
+                <div className="flex items-center gap-2">
+                  <span className="shrink-0 text-xs text-text-secondary">
+                    {t("home.addType")}
+                  </span>
+                  <div className="flex gap-2">
+                    {TYPE_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setCardType(opt.value)}
+                        className={`rounded-chip px-3 py-[6px] text-xs font-medium transition-all active:scale-95 cursor-pointer ${
+                          cardType === opt.value
+                            ? "bg-primary text-on-primary"
+                            : "glass-card text-text-secondary"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <button
                   onClick={handleSave}
                   disabled={saving}

@@ -11,7 +11,7 @@ export default async function CardsPage() {
 
   const { data: cards, count } = await supabase
     .from("flashcards")
-    .select("id, word, translation, level, learned, sm2_next_review, created_at, source_title, source_type", {
+    .select("id, word, translation, level, learned, sm2_next_review, created_at, source_title, source_type, type", {
       count: "exact",
     })
     .eq("user_id", user.id)

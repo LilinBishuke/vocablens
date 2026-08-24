@@ -16,7 +16,10 @@ export interface CardItem {
   created_at: string;
   source_title?: string | null;
   source_type?: string | null;
+  type?: string | null;
 }
+
+const TYPE_VALUES = [null, "vocab", "idiom", "slang"] as const;
 
 
 
@@ -29,11 +32,19 @@ export function CardsContent({
 }) {
   const t = useT();
   const FILTERS = [t("cards.all"), t("cards.groups"), t("cards.due"), t("cards.learned")];
+  const TYPES = [t("cards.all"), t("cards.typeVocab"), t("cards.typeIdiom"), t("cards.typeSlang")];
   const [search, setSearch] = useState("");
   const [filterIndex, setFilterIndex] = useState(0);
+  const [typeIndex, setTypeIndex] = useState(0);
 
   const filtered = useMemo(() => {
     let list = cards;
+
+    // 種類（vocab / idiom / slang）
+    const typeValue = TYPE_VALUES[typeIndex];
+    if (typeValue) {
+      list = list.filter((c) => (c.type ?? "vocab") === typeValue);
+    }
 
     // Filter（1=グループは別ビュー）
     if (filterIndex === 2) {
@@ -54,7 +65,7 @@ export function CardsContent({
     }
 
     return list;
-  }, [cards, search, filterIndex]);
+  }, [cards, search, filterIndex, typeIndex]);
 
   return (
     <>
@@ -78,6 +89,14 @@ export function CardsContent({
           activeIndex={filterIndex}
           onChange={setFilterIndex}
         />
+
+        {filterIndex !== 1 && (
+          <FilterChips
+            items={TYPES}
+            activeIndex={typeIndex}
+            onChange={setTypeIndex}
+          />
+        )}
 
         {filterIndex === 1 ? (
           <GroupsView cards={cards} />
