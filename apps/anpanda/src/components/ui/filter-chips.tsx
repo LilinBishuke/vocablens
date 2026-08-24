@@ -4,9 +4,39 @@ interface FilterChipsProps {
   items: string[];
   activeIndex: number;
   onChange: (index: number) => void;
+  /** chip=独立した丸チップの列（状態フィルタ）/ segmented=1枚の枠内で切り替え（カテゴリ） */
+  variant?: "chip" | "segmented";
 }
 
-export function FilterChips({ items, activeIndex, onChange }: FilterChipsProps) {
+export function FilterChips({
+  items,
+  activeIndex,
+  onChange,
+  variant = "chip",
+}: FilterChipsProps) {
+  if (variant === "segmented") {
+    return (
+      <div className="glass-card flex rounded-chip p-1">
+        {items.map((item, i) => {
+          const isActive = i === activeIndex;
+          return (
+            <button
+              key={item}
+              onClick={() => onChange(i)}
+              className={`min-w-0 flex-1 truncate rounded-chip px-2 py-[6px] text-xs font-medium transition-all cursor-pointer ${
+                isActive
+                  ? "bg-primary text-on-primary"
+                  : "text-text-secondary hover:text-text-primary"
+              }`}
+            >
+              {item}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <div className="flex gap-2 overflow-x-auto no-scrollbar">
       {items.map((item, i) => {

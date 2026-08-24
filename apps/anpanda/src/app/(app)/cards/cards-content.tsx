@@ -92,6 +92,7 @@ export function CardsContent({
 
         {filterIndex !== 1 && (
           <FilterChips
+            variant="segmented"
             items={TYPES}
             activeIndex={typeIndex}
             onChange={setTypeIndex}
