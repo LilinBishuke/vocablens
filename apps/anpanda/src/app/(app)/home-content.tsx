@@ -62,22 +62,19 @@ export function HomeContent({
         <ChevronRight size={16} className="shrink-0 text-text-muted" />
       </Link>
 
-      {/* 今日 */}
-      <div className="space-y-2">
-        <h2 className="text-[13px] font-semibold text-text-secondary">{t("home.today")}</h2>
-        <div className="rounded-card-lg bg-gradient-to-br from-hero-from to-hero-to p-[22px]">
-          <p className="text-[13px] font-medium text-white/85">{t("home.todayReview")}</p>
-          <div className="mt-3 flex items-center justify-between gap-3.5">
-            <p className="text-[30px] font-bold leading-none text-white">
-              {stats.dueCount}{t("common.cardsUnit")}
-            </p>
-            <Link
-              href="/review"
-              className="inline-flex shrink-0 items-center justify-center rounded-chip bg-white px-[18px] py-2.5 text-[13px] font-semibold text-hero-to transition-transform active:scale-95"
-            >
-              {t("home.startReview")}
-            </Link>
-          </div>
+      {/* 今日の復習（ヒーローカード） */}
+      <div className="rounded-card-lg bg-gradient-to-br from-hero-from to-hero-to p-[22px]">
+        <p className="text-[13px] font-medium text-white/85">{t("home.todayReview")}</p>
+        <div className="mt-3 flex items-center justify-between gap-3.5">
+          <p className="text-[30px] font-bold leading-none text-white">
+            {stats.dueCount}{t("common.cardsUnit")}
+          </p>
+          <Link
+            href="/review"
+            className="inline-flex shrink-0 items-center justify-center rounded-chip bg-white px-[18px] py-2.5 text-[13px] font-semibold text-hero-to transition-transform active:scale-95"
+          >
+            {t("home.startReview")}
+          </Link>
         </div>
       </div>
 

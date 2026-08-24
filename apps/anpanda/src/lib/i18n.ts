@@ -26,7 +26,6 @@ const DICT = {
   "home.learned": { ja: "覚えた", en: "Learned", zh: "已掌握" },
   "home.accuracy": { ja: "正解率", en: "Accuracy", zh: "正确率" },
   "home.cards": { ja: "カード", en: "Cards", zh: "卡片" },
-  "home.today": { ja: "今日", en: "Today", zh: "今天" },
   "home.todayReview": { ja: "今日の復習", en: "Today's Review", zh: "今日复习" },
   "home.startReview": { ja: "復習を始める", en: "Start Review", zh: "开始复习" },
   "home.recentWords": { ja: "最近追加した単語", en: "Recently Added", zh: "最近添加的单词" },
