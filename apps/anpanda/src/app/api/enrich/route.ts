@@ -71,6 +71,63 @@ async function callGemini(word: string, apiKey: string): Promise<EnrichPayload |
     console.error(`[enrich] empty candidates for "${word}": ${JSON.stringify(data).slice(0, 400)}`);
     return null;
   }
+  return parseEnrichJson(text, word);
+}
+
+// OpenAI互換API (Groq / DeepSeek)。JSONモードでスキーマ崩れを抑止
+interface CompatOpts {
+  url: string;
+  model: string;
+  label: string;
+}
+
+const GROQ_OPTS: CompatOpts = {
+  url: "https://api.groq.com/openai/v1/chat/completions",
+  model: "openai/gpt-oss-120b",
+  label: "groq",
+};
+
+const DEEPSEEK_OPTS: CompatOpts = {
+  url: "https://api.deepseek.com/chat/completions",
+  model: "deepseek-chat",
+  label: "deepseek",
+};
+
+async function callOpenAICompat(
+  word: string,
+  apiKey: string,
+  opts: CompatOpts
+): Promise<EnrichPayload | null> {
+  const res = await fetch(opts.url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: opts.model,
+      messages: [{ role: "user", content: buildPrompt(word) }],
+      response_format: { type: "json_object" },
+      temperature: 0.2,
+      max_tokens: 4000,
+    }),
+    signal: AbortSignal.timeout(25000),
+  });
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => "");
+    console.error(`[enrich] ${opts.label} ${res.status} for "${word}": ${errBody.slice(0, 500)}`);
+    return null;
+  }
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) {
+    console.error(`[enrich] ${opts.label} empty content for "${word}": ${JSON.stringify(data).slice(0, 400)}`);
+    return null;
+  }
+  return parseEnrichJson(text, word);
+}
+
+function parseEnrichJson(text: string, word: string): EnrichPayload | null {
   try {
     const p = JSON.parse(text);
     return {
@@ -134,8 +191,8 @@ async function fetchDictPhonetic(word: string): Promise<string | null> {
 
 /**
  * POST /api/enrich  { word }
- * Gemini + 辞書APIで単語情報を生成し、該当カードを更新して返す。
- * GEMINI_API_KEY 未設定時は 501。
+ * AI（Groq 優先 → DeepSeek → Gemini フォールバック）+ 辞書APIで単語情報を生成し、該当カードを更新して返す。
+ * GROQ_API_KEY / DEEPSEEK_API_KEY / GEMINI_API_KEY すべて未設定時は 501。
  */
 export async function POST(request: Request) {
   const supabase = await createClient();
@@ -146,8 +203,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
+  const groqKey = process.env.GROQ_API_KEY;
+  const deepseekKey = process.env.DEEPSEEK_API_KEY;
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (!groqKey && !deepseekKey && !geminiKey) {
     return NextResponse.json({ error: "not_configured" }, { status: 501 });
   }
 
@@ -162,23 +221,36 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "invalid word" }, { status: 400 });
   }
 
-  const [gemini, dictPhonetic] = await Promise.all([
-    callGemini(word, apiKey),
+  const [primary, dictPhonetic] = await Promise.all([
+    groqKey
+      ? callOpenAICompat(word, groqKey, GROQ_OPTS)
+      : deepseekKey
+        ? callOpenAICompat(word, deepseekKey, DEEPSEEK_OPTS)
+        : callGemini(word, geminiKey!),
     fetchDictPhonetic(word),
   ]);
 
-  if (!gemini) {
+  // 優先プロバイダが失敗した場合のフォールバック (DeepSeek → Gemini の順)
+  let ai = primary;
+  if (!ai && groqKey && deepseekKey) {
+    ai = await callOpenAICompat(word, deepseekKey, DEEPSEEK_OPTS);
+  }
+  if (!ai && (groqKey || deepseekKey) && geminiKey) {
+    ai = await callGemini(word, geminiKey);
+  }
+
+  if (!ai) {
     return NextResponse.json({ error: "generation_failed" }, { status: 502 });
   }
 
-  const phonetic = dictPhonetic ?? gemini.phonetic;
+  const phonetic = dictPhonetic ?? ai.phonetic;
   const definition = {
-    pos: gemini.pos ?? "",
-    meanings: gemini.meanings,
-    etymology: gemini.etymology ?? undefined,
-    grammar: gemini.grammar ?? undefined,
-    slang: gemini.slang ?? undefined,
-    examples: gemini.examples,
+    pos: ai.pos ?? "",
+    meanings: ai.meanings,
+    etymology: ai.etymology ?? undefined,
+    grammar: ai.grammar ?? undefined,
+    slang: ai.slang ?? undefined,
+    examples: ai.examples,
   };
 
   // 該当カードを更新（存在すれば）
@@ -194,8 +266,8 @@ export async function POST(request: Request) {
     await supabase
       .from("flashcards")
       .update({
-        level: gemini.level != null ? String(gemini.level) : existing.level,
-        translation: gemini.translation ?? existing.translation,
+        level: ai.level != null ? String(ai.level) : existing.level,
+        translation: ai.translation ?? existing.translation,
         phonetic: phonetic ?? existing.phonetic,
         definition,
       })
@@ -204,8 +276,8 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     word,
-    level: gemini.level,
-    translation: gemini.translation,
+    level: ai.level,
+    translation: ai.translation,
     phonetic,
     definition,
     updated: Boolean(existing),
