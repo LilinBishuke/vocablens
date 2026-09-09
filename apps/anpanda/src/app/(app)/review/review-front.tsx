@@ -59,7 +59,7 @@ export function ReviewFront({ card }: { card: Flashcard }) {
       </div>
 
       {/* 評価エリアの場所だけ確保（フリップ後と同じ高さ・非表示） */}
-      <div className="invisible shrink-0 space-y-3 px-page pb-7 pt-2" aria-hidden>
+      <div className="invisible shrink-0 space-y-2 px-page pb-6 pt-2" aria-hidden>
         <p className="text-center text-[14px] font-medium">{t("review.remembered")}</p>
         <FaceRating onRate={() => {}} disabled />
       </div>

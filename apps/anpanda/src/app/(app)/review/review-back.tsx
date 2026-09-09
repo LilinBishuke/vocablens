@@ -67,6 +67,9 @@ export function ReviewBack({ card }: { card: Flashcard }) {
       : [];
   const allExamples: { en: string; ja?: string }[] =
     examples.length > 0 ? examples : legacyExamples;
+  const conjugations = (def?.conjugations ?? []).filter(
+    (c) => c.label && c.value
+  );
 
   return (
     <>
@@ -89,8 +92,8 @@ export function ReviewBack({ card }: { card: Flashcard }) {
             {card.word}
           </span>
 
-          {/* Phonetic + audio */}
-          <div className="flex items-center gap-3">
+          {/* Phonetic + audio（タイトルとの余白は詰める） */}
+          <div className="-mt-1.5 flex items-center gap-3">
             {card.phonetic && (
               <span className="text-sm text-text-muted">{card.phonetic}</span>
             )}
@@ -113,6 +116,23 @@ export function ReviewBack({ card }: { card: Flashcard }) {
           )}
           {def?.pos && (
             <span className="text-[12px] text-text-muted">{def.pos}</span>
+          )}
+
+          {/* 変化形（時制変化・比較級など） */}
+          {conjugations.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-1.5">
+              {conjugations.map((c, i) => (
+                <span
+                  key={i}
+                  className="inline-flex items-baseline gap-1 rounded-badge border border-border-glass bg-surface px-2 py-1"
+                >
+                  <span className="text-[10px] text-text-muted">{c.label}</span>
+                  <span className="text-[12px] font-semibold text-text-primary">
+                    {c.value}
+                  </span>
+                </span>
+              ))}
+            </div>
           )}
 
           {/* 多義 */}
@@ -155,38 +175,18 @@ export function ReviewBack({ card }: { card: Flashcard }) {
             </div>
           )}
 
-          {/* 語源 */}
-          {def?.etymology && (
-            <InfoBlock label={t("review.etymology")} text={def.etymology} />
-          )}
-          {/* 文法・使い方 */}
-          {def?.grammar && (
-            <InfoBlock label={t("review.grammar")} text={def.grammar} />
-          )}
-          {/* スラング */}
-          {def?.slang && <InfoBlock label={t("review.slang")} text={def.slang} />}
+          {/* 語源・文法・スラングは復習カードでは表示しない（カード詳細のみ） */}
           </div>
         </div>
       </div>
 
       {/* Bottom: 5段階フェイス評価 */}
-      <div className="shrink-0 space-y-3 px-page pb-7 pt-2">
+      <div className="shrink-0 space-y-2 px-page pb-6 pt-2">
         <p className="text-center text-[14px] font-medium text-text-secondary">
           {t("review.remembered")}
         </p>
         <FaceRating onRate={handleRate} />
       </div>
     </>
-  );
-}
-
-function InfoBlock({ label, text }: { label: string; text: string }) {
-  return (
-    <div className="w-full rounded-[14px] border border-border-glass bg-surface px-4 py-3 text-left">
-      <p className="text-[10px] font-semibold text-primary-strong">{label}</p>
-      <p className="mt-1 text-[12px] leading-relaxed text-text-primary">
-        {text}
-      </p>
-    </div>
   );
 }
