@@ -18,9 +18,9 @@ export function ReviewFront({ card }: { card: Flashcard }) {
 
   return (
     <>
-      <div className="flex flex-1 flex-col px-6 pb-3 pt-3">
-        {/* カード束（表裏で同一ジオメトリ。評価エリアの上まで伸ばす） */}
-        <div className="relative flex-1">
+      {/* min-h-0: 内容が多くてもカードを画面内にクランプ（裏面と同一ジオメトリ） */}
+      <div className="flex min-h-0 flex-1 flex-col px-6 pb-3 pt-3">
+        <div className="relative min-h-0 flex-1">
           <div
             className="absolute inset-x-4 top-3 bottom-[-10px] rounded-card-lg bg-surface/50"
             style={{ transform: "rotate(-3deg)" }}
