@@ -64,7 +64,7 @@ export function ReviewSession({
   const progressPercent = ((currentIndex + 1) / deck.length) * 100;
 
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col">
       {/* Header */}
       <SessionHeader progress={progress} onClose={() => router.push("/")} />
 
