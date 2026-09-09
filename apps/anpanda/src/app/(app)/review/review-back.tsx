@@ -70,16 +70,15 @@ export function ReviewBack({ card }: { card: Flashcard }) {
 
   return (
     <>
-      <div className="flex flex-1 flex-col px-6 pt-3">
-        <div className="relative">
+      <div className="flex flex-1 flex-col px-6 pb-3 pt-3">
+        <div className="relative flex-1">
           <div
             className="absolute inset-x-4 top-3 bottom-[-10px] rounded-card-lg bg-surface/50"
             style={{ transform: "rotate(-3deg)" }}
             aria-hidden
           />
           <div
-            className="animate-flip-in glass-card relative flex w-full flex-col items-center gap-3 overflow-y-auto rounded-card-lg px-6 py-6"
-            style={{ height: "min(440px, 52dvh)" }}
+            className="animate-flip-in glass-card relative flex h-full w-full flex-col items-center gap-3 overflow-y-auto rounded-card-lg px-6 py-6"
           >
           {/* Lv */}
           {card.level && <LevelBadge level={Number(card.level)} showLabel />}
@@ -171,7 +170,7 @@ export function ReviewBack({ card }: { card: Flashcard }) {
 
       {/* Bottom: 5段階フェイス評価 */}
       <div className="shrink-0 space-y-3 px-page pb-7 pt-2">
-        <p className="text-center text-[11px] text-text-muted">
+        <p className="text-center text-[14px] font-medium text-text-secondary">
           {t("review.remembered")}
         </p>
         <FaceRating onRate={handleRate} />

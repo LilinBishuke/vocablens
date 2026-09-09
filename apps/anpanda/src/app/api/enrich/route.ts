@@ -24,6 +24,9 @@ interface EnrichPayload {
   slang: string | null;
   examples: { en: string; ja: string }[];
   phonetic: string | null;
+  conjugations: { label: string; value: string }[];
+  synonyms: { word: string; ja: string; diff: string }[];
+  antonyms: { word: string; ja: string }[];
 }
 
 function buildPrompt(word: string): string {
@@ -39,7 +42,10 @@ function buildPrompt(word: string): string {
   "grammar": "文法・使い方（日本語1〜2文。可算/不可算、自他動詞、よく使うコロケーションや前置詞）",
   "slang": "スラング・口語での用法（あれば日本語1〜2文、なければ null）",
   "examples": [{"en": "自然な例文", "ja": "その日本語訳"}] （2件。日常で使う自然な文）,
-  "phonetic": "IPA発音記号（例: /əˈfɪnɪti/。不明なら null）
+  "phonetic": "IPA発音記号（例: /əˈfɪnɪti/。不明なら null）,
+  "conjugations": [{"label": "変化の種類", "value": "その形"}] （動詞なら 過去形/過去分詞/現在分詞/三単現、形容詞・副詞なら 比較級/最上級、名詞なら不規則な複数形のみ。変化しない語は []）,
+  "synonyms": [{"word": "同義語", "ja": "日本語訳", "diff": "見出し語とのニュアンス・使い分けの違い（日本語1文で簡潔に）"}] （重要順に最大3件。なければ []）,
+  "antonyms": [{"word": "反対語", "ja": "日本語訳"}] （最大3件。なければ []）
 }`;
 }
 
@@ -163,6 +169,41 @@ function parseEnrichJson(text: string, word: string): EnrichPayload | null {
             }))
         : [],
       phonetic: typeof p.phonetic === "string" ? p.phonetic : null,
+      conjugations: Array.isArray(p.conjugations)
+        ? p.conjugations
+            .filter(
+              (c: { label?: unknown; value?: unknown }) =>
+                typeof c?.label === "string" && c.label && typeof c?.value === "string" && c.value
+            )
+            .slice(0, 6)
+            .map((c: { label: string; value: string }) => ({
+              label: c.label,
+              value: c.value,
+            }))
+        : [],
+      synonyms: Array.isArray(p.synonyms)
+        ? p.synonyms
+            .filter(
+              (s: { word?: unknown }) => typeof s?.word === "string" && s.word
+            )
+            .slice(0, 3)
+            .map((s: { word: string; ja?: string; diff?: string }) => ({
+              word: s.word,
+              ja: typeof s.ja === "string" ? s.ja : "",
+              diff: typeof s.diff === "string" ? s.diff : "",
+            }))
+        : [],
+      antonyms: Array.isArray(p.antonyms)
+        ? p.antonyms
+            .filter(
+              (a: { word?: unknown }) => typeof a?.word === "string" && a.word
+            )
+            .slice(0, 3)
+            .map((a: { word: string; ja?: string }) => ({
+              word: a.word,
+              ja: typeof a.ja === "string" ? a.ja : "",
+            }))
+        : [],
     };
   } catch (e) {
     console.error(`[enrich] JSON parse failed for "${word}": ${String(e)} :: ${text.slice(0, 300)}`);
@@ -251,12 +292,15 @@ export async function POST(request: Request) {
     grammar: ai.grammar ?? undefined,
     slang: ai.slang ?? undefined,
     examples: ai.examples,
+    conjugations: ai.conjugations,
+    synonyms: ai.synonyms,
+    antonyms: ai.antonyms,
   };
 
   // 該当カードを更新（存在すれば）
   const { data: existing } = await supabase
     .from("flashcards")
-    .select("id, level, translation, phonetic")
+    .select("id, level, translation, phonetic, synonyms")
     .eq("user_id", user.id)
     .eq("word", word)
     .is("deleted_at", null)
@@ -269,6 +313,10 @@ export async function POST(request: Request) {
         level: ai.level != null ? String(ai.level) : existing.level,
         translation: ai.translation ?? existing.translation,
         phonetic: phonetic ?? existing.phonetic,
+        synonyms:
+          ai.synonyms.length > 0
+            ? ai.synonyms.map((s) => s.word)
+            : existing.synonyms,
         definition,
       })
       .eq("id", existing.id);

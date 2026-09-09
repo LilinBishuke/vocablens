@@ -1,38 +1,26 @@
 "use client";
 
-import { useEffect } from "react";
 import { Volume2 } from "lucide-react";
 import { useReviewStore } from "@/lib/stores/review-store";
 import { speakWord } from "@/lib/utils/speak";
-import { useSettings, useT } from "@/lib/contexts/settings-context";
+import { useT } from "@/lib/contexts/settings-context";
 import { LevelBadge } from "@/components/ui";
 import { FaceRating } from "@/components/ui/face-rating";
 import type { Flashcard } from "@/lib/types";
 
 export function ReviewFront({ card }: { card: Flashcard }) {
   const { flipCard } = useReviewStore();
-  const { auto_play_audio } = useSettings();
   const t = useT();
 
   function speak() {
     speakWord(card.word);
   }
 
-  useEffect(() => {
-    if (!auto_play_audio) return;
-    const t = setTimeout(speak, 400);
-    return () => {
-      clearTimeout(t);
-      speechSynthesis.cancel();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [card.word, auto_play_audio]);
-
   return (
     <>
-      <div className="flex flex-1 flex-col px-6 pt-3">
-        {/* カード束（表裏で同一ジオメトリ） */}
-        <div className="relative">
+      <div className="flex flex-1 flex-col px-6 pb-3 pt-3">
+        {/* カード束（表裏で同一ジオメトリ。評価エリアの上まで伸ばす） */}
+        <div className="relative flex-1">
           <div
             className="absolute inset-x-4 top-3 bottom-[-10px] rounded-card-lg bg-surface/50"
             style={{ transform: "rotate(-3deg)" }}
@@ -43,8 +31,7 @@ export function ReviewFront({ card }: { card: Flashcard }) {
             role="button"
             tabIndex={0}
             onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && flipCard()}
-            className="animate-flip-in glass-card relative flex w-full flex-col items-center justify-center gap-4 rounded-card-lg p-8 cursor-pointer transition-transform active:scale-[0.99]"
-            style={{ height: "min(440px, 52dvh)" }}
+            className="animate-flip-in glass-card relative flex h-full w-full flex-col items-center justify-center gap-4 rounded-card-lg p-8 cursor-pointer transition-transform active:scale-[0.99]"
             aria-label="タップして答えを見る"
           >
             {card.level && <LevelBadge level={Number(card.level)} showLabel />}
@@ -73,7 +60,7 @@ export function ReviewFront({ card }: { card: Flashcard }) {
 
       {/* 評価エリアの場所だけ確保（フリップ後と同じ高さ・非表示） */}
       <div className="invisible shrink-0 space-y-3 px-page pb-7 pt-2" aria-hidden>
-        <p className="text-center text-[11px]">{t("review.remembered")}</p>
+        <p className="text-center text-[14px] font-medium">{t("review.remembered")}</p>
         <FaceRating onRate={() => {}} disabled />
       </div>
     </>

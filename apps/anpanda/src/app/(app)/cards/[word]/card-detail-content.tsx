@@ -30,8 +30,10 @@ export function CardDetailContent({
   const triedRef = useRef(false);
 
   const def = card.definition;
+  // def.synonyms 未定義 = 旧形式（変化形・類語・反対語なし）→ 再取得対象
   const needsEnrich =
     !def?.etymology ||
+    !def?.synonyms ||
     !card.translation ||
     !Number.isFinite(Number(card.level));
 
@@ -101,6 +103,12 @@ export function CardDetailContent({
       ? meanings.flatMap((m) => (m.examples ?? []).map((en) => ({ en })))
       : [];
   const allExamples = examples.length > 0 ? examples : legacyExamples;
+
+  const conjugations = (def?.conjugations ?? []).filter(
+    (c) => c.label && c.value
+  );
+  const richSynonyms = (def?.synonyms ?? []).filter((s) => s.word);
+  const antonyms = (def?.antonyms ?? []).filter((a) => a.word);
 
   return (
     <div className="flex flex-1 flex-col">
@@ -192,6 +200,26 @@ export function CardDetailContent({
           </section>
         )}
 
+        {/* 変化形（時制変化・比較級など） */}
+        {conjugations.length > 0 && (
+          <section className="space-y-2">
+            <SectionLabel>{t("detail.conjugations")}</SectionLabel>
+            <div className="flex flex-wrap gap-1.5">
+              {conjugations.map((c, i) => (
+                <span
+                  key={i}
+                  className="glass-card inline-flex items-baseline gap-1.5 rounded-badge px-2.5 py-1.5"
+                >
+                  <span className="text-[10px] text-text-muted">{c.label}</span>
+                  <span className="text-[13px] font-semibold text-text-primary">
+                    {c.value}
+                  </span>
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* 語源 / 文法 / スラング */}
         {def?.etymology && <InfoCard label={t("review.etymology")} text={def.etymology} />}
         {def?.grammar && <InfoCard label={t("review.grammar")} text={def.grammar} />}
@@ -218,14 +246,61 @@ export function CardDetailContent({
           </section>
         )}
 
-        {/* 類語 */}
-        {card.synonyms && card.synonyms.length > 0 && (
+        {/* 類語（違いの説明付き。旧データは card.synonyms にフォールバック） */}
+        {richSynonyms.length > 0 ? (
+          <section className="space-y-2">
+            <SectionLabel>{t("detail.synonyms")}</SectionLabel>
+            <div className="glass-card space-y-2.5 rounded-button px-4 py-3">
+              {richSynonyms.map((s, i) => (
+                <div key={i}>
+                  <p className="text-[13px] font-semibold text-text-primary">
+                    {s.word}
+                    {s.ja && (
+                      <span className="ml-2 text-[12px] font-normal text-text-secondary">
+                        {s.ja}
+                      </span>
+                    )}
+                  </p>
+                  {s.diff && (
+                    <p className="mt-0.5 text-[12px] leading-relaxed text-text-secondary">
+                      {s.diff}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : card.synonyms && card.synonyms.length > 0 ? (
           <p className="text-[13px] text-text-muted">
             {t("detail.synonyms")}:{" "}
             <span className="text-text-primary">
               {card.synonyms.join(", ")}
             </span>
           </p>
+        ) : null}
+
+        {/* 反対語 */}
+        {antonyms.length > 0 && (
+          <section className="space-y-2">
+            <SectionLabel>{t("detail.antonyms")}</SectionLabel>
+            <div className="flex flex-wrap gap-1.5">
+              {antonyms.map((a, i) => (
+                <span
+                  key={i}
+                  className="glass-card inline-flex items-baseline gap-1.5 rounded-badge px-2.5 py-1.5"
+                >
+                  <span className="text-[13px] font-semibold text-text-primary">
+                    {a.word}
+                  </span>
+                  {a.ja && (
+                    <span className="text-[11px] text-text-secondary">
+                      {a.ja}
+                    </span>
+                  )}
+                </span>
+              ))}
+            </div>
+          </section>
         )}
 
         {/* フォルダ */}

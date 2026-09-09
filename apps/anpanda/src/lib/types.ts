@@ -19,6 +19,12 @@ export interface Flashcard {
     slang?: string;
     /** 例文（英+訳） */
     examples?: { en: string; ja?: string }[];
+    /** 変化形（動詞の時制変化・形容詞の比較級など。変化しない語は空配列） */
+    conjugations?: { label: string; value: string }[];
+    /** 同義語（ニュアンスの違いの簡潔な説明付き） */
+    synonyms?: { word: string; ja?: string; diff?: string }[];
+    /** 反対語 */
+    antonyms?: { word: string; ja?: string }[];
   } | null;
   synonyms: string[] | null;
   level: string | null;

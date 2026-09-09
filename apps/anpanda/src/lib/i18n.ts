@@ -111,6 +111,8 @@ const DICT = {
   // 詳細
   "detail.meaning": { ja: "意味", en: "Meaning", zh: "释义" },
   "detail.synonyms": { ja: "類語", en: "Synonyms", zh: "近义词" },
+  "detail.antonyms": { ja: "反対語", en: "Antonyms", zh: "反义词" },
+  "detail.conjugations": { ja: "変化形", en: "Word Forms", zh: "词形变化" },
   "detail.record": { ja: "学習記録", en: "Study Record", zh: "学习记录" },
   "detail.addedOn": { ja: "追加日", en: "Added", zh: "添加日期" },
   "detail.reviews": { ja: "復習回数", en: "Reviews", zh: "复习次数" },

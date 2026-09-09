@@ -280,12 +280,6 @@ export function SettingsContent({ email, settings, userId }: Props) {
                 </div>
               </>
             )}
-            <Divider />
-            <SettingsToggleRow
-              label={t("settings.autoAudio")}
-              enabled={s.auto_play_audio}
-              onToggle={(v) => updateSetting("auto_play_audio", v)}
-            />
           </SettingsCard>
         </SettingsSection>
 

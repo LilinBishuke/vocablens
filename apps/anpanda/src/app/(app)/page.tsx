@@ -57,7 +57,7 @@ export default async function HomePage() {
         .eq("user_id", user.id)
         .is("deleted_at", null)
         .order("created_at", { ascending: false })
-        .limit(5),
+        .limit(10),
       supabase
         .from("user_puzzles")
         .select("pieces_revealed, puzzle:puzzles(name, total_pieces)")
