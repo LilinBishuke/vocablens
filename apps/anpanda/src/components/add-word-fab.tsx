@@ -4,7 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Search, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { useT } from "@/lib/contexts/settings-context";
+import { useSettings, useT } from "@/lib/contexts/settings-context";
+
+/** 日本語の単語として妥当か（漢字・ひらがな・カタカナを1文字以上含む） */
+const JA_WORD_RE =
+  /^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}々〆ーｰ〜・]{1,30}$/u;
 
 interface LookupResult {
   word: string;
@@ -23,6 +27,8 @@ type CardType = "vocab" | "idiom" | "slang";
 export function AddWordFab() {
   const router = useRouter();
   const t = useT();
+  const { learning_language } = useSettings();
+  const isJa = learning_language === "ja";
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [looking, setLooking] = useState(false);
@@ -50,17 +56,19 @@ export function AddWordFab() {
   }
 
   async function handleLookup() {
-    const word = input.trim().toLowerCase();
+    const word = isJa ? input.trim() : input.trim().toLowerCase();
     if (!word) return;
-    if (!/^[a-z][a-z' -]{0,49}$/.test(word)) {
-      setError("英単語を入力してください");
+    if (isJa ? !JA_WORD_RE.test(word) : !/^[a-z][a-z' -]{0,49}$/.test(word)) {
+      setError(isJa ? t("add.invalidJa") : t("add.invalidEn"));
       return;
     }
     setLooking(true);
     setError("");
     setResult(null);
     try {
-      const res = await fetch(`/api/dictionary?word=${encodeURIComponent(word)}`);
+      const res = await fetch(
+        `/api/dictionary?word=${encodeURIComponent(word)}&lang=${learning_language}`
+      );
       if (!res.ok) throw new Error();
       const data: LookupResult = await res.json();
       setResult(data);
@@ -96,6 +104,7 @@ export function AddWordFab() {
         translation: result.translation,
         definition: result.definition,
         type: cardType,
+        language: learning_language,
         source_type: null,
         source_title: "手動で追加",
       },
@@ -116,7 +125,7 @@ export function AddWordFab() {
       await fetch("/api/enrich", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ word: result.word }),
+        body: JSON.stringify({ word: result.word, language: learning_language }),
       });
     } catch {
       // 生成失敗でもカード自体は保存済み
@@ -179,7 +188,7 @@ export function AddWordFab() {
                   setSavedWord("");
                 }}
                 onKeyDown={(e) => e.key === "Enter" && handleLookup()}
-                placeholder="例: serendipity"
+                placeholder={isJa ? "例: 木漏れ日" : "例: serendipity"}
                 autoCapitalize="none"
                 autoCorrect="off"
                 className="glass-card h-12 min-w-0 flex-1 rounded-button px-4 text-[15px] text-text-primary placeholder:text-text-muted outline-none focus:border-primary transition-colors"

@@ -13,7 +13,7 @@ export function ReviewFront({ card }: { card: Flashcard }) {
   const t = useT();
 
   function speak() {
-    speakWord(card.word);
+    speakWord(card.word, card.language);
   }
 
   return (

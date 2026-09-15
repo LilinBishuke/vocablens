@@ -29,6 +29,8 @@ export interface Flashcard {
   synonyms: string[] | null;
   level: string | null;
   type: "vocab" | "slang" | "idiom";
+  /** 学習言語: en=英単語, ja=日本語単語 */
+  language: "en" | "ja";
 
   sm2_repetitions: number;
   sm2_interval: number;

@@ -14,6 +14,12 @@ export default async function FolderPage({
   } = await supabase.auth.getUser();
   if (!user) return null;
 
+  const { data: langSetting } = await supabase
+    .from("user_settings")
+    .select("learning_language")
+    .eq("user_id", user.id)
+    .single();
+
   const [folderRes, cardsRes] = await Promise.all([
     supabase.from("folders").select("id, name").eq("id", id).single(),
     supabase
@@ -22,6 +28,7 @@ export default async function FolderPage({
         "id, word, translation, level, learned, sm2_next_review, flashcard_folders!inner(folder_id)"
       )
       .eq("user_id", user.id)
+      .eq("language", langSetting?.learning_language ?? "en")
       .is("deleted_at", null)
       .eq("flashcard_folders.folder_id", id)
       .order("created_at", { ascending: false }),

@@ -10,24 +10,29 @@ export default async function SummaryPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const [historyRes, cardsRes, langRes] = await Promise.all([
+  const { data: settingsData } = await supabase
+    .from("user_settings")
+    .select("display_lang, learning_language")
+    .eq("user_id", user.id)
+    .single();
+  const lang = settingsData?.learning_language ?? "en";
+
+  const [historyRes, cardsRes] = await Promise.all([
     supabase
       .from("review_history")
-      .select("reviewed_at, is_correct")
+      .select("reviewed_at, is_correct, flashcards!inner(language)")
       .eq("user_id", user.id)
+      .eq("flashcards.language", lang)
       .order("reviewed_at", { ascending: false })
       .limit(2000),
     supabase
       .from("flashcards")
       .select("level, source_title, source_type, learned")
       .eq("user_id", user.id)
+      .eq("language", lang)
       .is("deleted_at", null),
-    supabase
-      .from("user_settings")
-      .select("display_lang")
-      .eq("user_id", user.id)
-      .single(),
   ]);
+  const langRes = { data: settingsData };
   const t = getT(normalizeLang(langRes.data?.display_lang));
 
   const history = historyRes.data ?? [];

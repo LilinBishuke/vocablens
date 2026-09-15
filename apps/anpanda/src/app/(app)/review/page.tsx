@@ -36,26 +36,27 @@ export default async function ReviewPage({
     return q;
   }
 
-  // settings と新規カードを並列取得（新規カードは上限最大値20で取り、後で絞る）
-  const [settingsRes, newCardsRes] = await Promise.all([
+  // settings を先に取得（学習モードでカードを分離するため）
+  const { data: settings } = await supabase
+    .from("user_settings")
+    .select("daily_limit, new_cards_per_day, learning_language")
+    .eq("user_id", user.id)
+    .single();
+  const lang = settings?.learning_language ?? "en";
+
+  // 新規カード（上限最大値20で取り、後で絞る）
+  const newCardsRes = await scopeQuery(
     supabase
-      .from("user_settings")
-      .select("daily_limit, new_cards_per_day")
+      .from("flashcards")
+      .select("*")
       .eq("user_id", user.id)
-      .single(),
-    scopeQuery(
-      supabase
-        .from("flashcards")
-        .select("*")
-        .eq("user_id", user.id)
-        .is("deleted_at", null)
-        .eq("learned", false)
-        .eq("sm2_repetitions", 0)
-        .order("created_at", { ascending: true })
-        .limit(20)
-    ),
-  ]);
-  const settings = settingsRes.data;
+      .eq("language", lang)
+      .is("deleted_at", null)
+      .eq("learned", false)
+      .eq("sm2_repetitions", 0)
+      .order("created_at", { ascending: true })
+      .limit(20)
+  );
   const dailyLimit = settings?.daily_limit ?? 20;
   const newCardsPerDay = settings?.new_cards_per_day ?? 5;
   const newCards = (newCardsRes.data ?? []).slice(0, newCardsPerDay);
@@ -69,6 +70,7 @@ export default async function ReviewPage({
       .from("flashcards")
       .select("*")
       .eq("user_id", user.id)
+      .eq("language", lang)
       .is("deleted_at", null)
       .eq("learned", false)
       .gt("sm2_repetitions", 0)

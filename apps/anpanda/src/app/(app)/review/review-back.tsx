@@ -15,7 +15,7 @@ export function ReviewBack({ card }: { card: Flashcard }) {
   const t = useT();
 
   function handleSpeak() {
-    speakWord(card.word);
+    speakWord(card.word, card.language);
   }
 
   function handleRate(rating: FaceRatingEntry) {

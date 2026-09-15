@@ -32,9 +32,19 @@ interface LevelBadgeProps {
   stacked?: boolean;
 }
 
+// 日本語モードは JLPT 表記（1=N5 ... 5=N1）
+const JLPT_LABEL: Record<number, string> = {
+  1: "N5",
+  2: "N4",
+  3: "N3",
+  4: "N2",
+  5: "N1",
+};
+
 /** 難易度表示: 小さな色ドット + 控えめな「Lv.n」表記（難易度は強調しない方針） */
 export function LevelBadge({ level, showLabel = false, stacked = false }: LevelBadgeProps) {
-  const { level_system, show_level } = useSettings();
+  const { level_system, show_level, learning_language } = useSettings();
+  const isJa = learning_language === "ja";
 
   // 設定で難易度表示オフ、または level が数値でないカードは表示しない
   if (!show_level) return null;
@@ -43,7 +53,7 @@ export function LevelBadge({ level, showLabel = false, stacked = false }: LevelB
   let displayLevel: number;
   let style: LevelStyle;
 
-  if (level_system === "3") {
+  if (!isJa && level_system === "3") {
     displayLevel = mapTo3(level);
     style = config3[displayLevel] ?? config3[2];
   } else {
@@ -51,12 +61,15 @@ export function LevelBadge({ level, showLabel = false, stacked = false }: LevelB
     style = config5[level] ?? config5[3];
   }
 
+  // 日本語モードは常に JLPT の N 表記（3段階設定は英語のみの概念）
+  const levelText = isJa ? (JLPT_LABEL[level] ?? "N3") : `Lv.${displayLevel}`;
+
   if (stacked) {
     return (
       <span className="inline-flex flex-col items-center gap-1">
         <span className={`h-[7px] w-[7px] rounded-full ${style.dot}`} />
         <span className="text-[9px] font-medium leading-none text-text-muted">
-          Lv.{displayLevel}
+          {levelText}
         </span>
       </span>
     );
@@ -66,8 +79,8 @@ export function LevelBadge({ level, showLabel = false, stacked = false }: LevelB
     <span className="inline-flex items-center gap-1.5">
       <span className={`h-[7px] w-[7px] shrink-0 rounded-full ${style.dot}`} />
       <span className="text-[10px] font-medium text-text-muted">
-        Lv.{displayLevel}
-        {showLabel && ` ${style.label}`}
+        {levelText}
+        {showLabel && !isJa && ` ${style.label}`}
       </span>
     </span>
   );

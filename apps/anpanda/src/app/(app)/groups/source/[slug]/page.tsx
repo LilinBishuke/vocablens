@@ -20,10 +20,17 @@ export default async function SourceGroupPage({
   } = await supabase.auth.getUser();
   if (!user) return null;
 
+  const { data: langSetting } = await supabase
+    .from("user_settings")
+    .select("learning_language")
+    .eq("user_id", user.id)
+    .single();
+
   let query = supabase
     .from("flashcards")
     .select("id, word, translation, level, learned, sm2_next_review")
     .eq("user_id", user.id)
+    .eq("language", langSetting?.learning_language ?? "en")
     .is("deleted_at", null)
     .order("created_at", { ascending: false });
 

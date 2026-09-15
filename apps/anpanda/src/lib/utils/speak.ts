@@ -1,5 +1,5 @@
 /**
- * 英単語の読み上げ（iOS対応版）。
+ * 単語の読み上げ（iOS対応版）。英語・日本語対応。
  * - マナーモード対策: 無音バッファ再生で audio session を「メディア再生」に切替
  *   （これをしないと iOS のサイレントスイッチONで TTS が無音になる）
  * - cancel 直後の speak が落ちる iOS の競合を 1tick 遅延で回避
@@ -25,20 +25,20 @@ function unlockAudioSession() {
   }
 }
 
-export function speakWord(text: string) {
+export function speakWord(text: string, lang: "en" | "ja" = "en") {
   try {
     const synth = window.speechSynthesis;
     if (!synth) return;
     unlockAudioSession();
     synth.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = "en-US";
+    u.lang = lang === "ja" ? "ja-JP" : "en-US";
     u.rate = 0.95;
     u.volume = 1;
     const voices = synth.getVoices();
     const voice =
-      voices.find((v) => v.lang?.startsWith("en") && v.localService) ??
-      voices.find((v) => v.lang?.startsWith("en"));
+      voices.find((v) => v.lang?.startsWith(lang) && v.localService) ??
+      voices.find((v) => v.lang?.startsWith(lang));
     if (voice) u.voice = voice;
     setTimeout(() => {
       synth.resume();

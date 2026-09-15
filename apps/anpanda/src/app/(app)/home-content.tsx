@@ -5,6 +5,7 @@ import { ChevronRight } from "lucide-react";
 import { WordRow } from "@/components/ui";
 import { useT } from "@/lib/contexts/settings-context";
 import { AddWordFab } from "@/components/add-word-fab";
+import { LanguageModeToggle } from "@/components/language-mode-toggle";
 import type { UserStats } from "@/lib/types";
 
 interface RecentWord {
@@ -50,6 +51,9 @@ export function HomeContent({
   const t = useT();
   return (
     <div className="flex-1 space-y-[18px] px-page pb-6 pt-1">
+      {/* 学習言語モード切替（英語 / 日本語） */}
+      <LanguageModeToggle />
+
       {/* 統計行（グループ化・学習サマリーへ） */}
       <Link
         href="/summary"

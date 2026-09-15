@@ -9,6 +9,8 @@ interface AppSettings {
   translation_lang: string;
   show_level: boolean;
   display_lang: string;
+  /** 現在の学習モード: en=英語, ja=日本語 */
+  learning_language: string;
 }
 
 const defaults: AppSettings = {
@@ -17,6 +19,7 @@ const defaults: AppSettings = {
   translation_lang: "ja",
   show_level: true,
   display_lang: "ja",
+  learning_language: "en",
 };
 
 const SettingsContext = createContext<AppSettings>(defaults);

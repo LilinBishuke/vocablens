@@ -47,7 +47,7 @@ export function CardDetailContent({
         const res = await fetch("/api/enrich", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ word: card.word }),
+          body: JSON.stringify({ word: card.word, language: card.language }),
         });
         if (res.status === 501) {
           setAiUnavailable(true);
@@ -80,7 +80,7 @@ export function CardDetailContent({
   }
 
   function handleSpeak() {
-    speakWord(card.word);
+    speakWord(card.word, card.language);
   }
 
   const nextReview = new Date(card.sm2_next_review);

@@ -26,17 +26,27 @@ export default async function HomePage() {
       .upsert({ user_id: user.id }, { onConflict: "user_id", ignoreDuplicates: true }),
   ]);
 
+  // 現在の学習モード（英語 / 日本語）で全データを分離
+  const { data: langSetting } = await supabase
+    .from("user_settings")
+    .select("learning_language")
+    .eq("user_id", user.id)
+    .single();
+  const lang = langSetting?.learning_language ?? "en";
+
   const [cardsRes, dueRes, learnedRes, historyRes, recentRes, puzzleRes] =
     await Promise.all([
       supabase
         .from("flashcards")
         .select("id", { count: "exact", head: true })
         .eq("user_id", user.id)
+        .eq("language", lang)
         .is("deleted_at", null),
       supabase
         .from("flashcards")
         .select("id", { count: "exact", head: true })
         .eq("user_id", user.id)
+        .eq("language", lang)
         .is("deleted_at", null)
         .eq("learned", false)
         .lte("sm2_next_review", new Date().toISOString()),
@@ -44,17 +54,20 @@ export default async function HomePage() {
         .from("flashcards")
         .select("id", { count: "exact", head: true })
         .eq("user_id", user.id)
+        .eq("language", lang)
         .is("deleted_at", null)
         .eq("learned", true),
       supabase
         .from("review_history")
-        .select("quality")
+        .select("quality, flashcards!inner(language)")
         .eq("user_id", user.id)
+        .eq("flashcards.language", lang)
         .limit(500),
       supabase
         .from("flashcards")
         .select("id, word, translation, level, created_at")
         .eq("user_id", user.id)
+        .eq("language", lang)
         .is("deleted_at", null)
         .order("created_at", { ascending: false })
         .limit(10),

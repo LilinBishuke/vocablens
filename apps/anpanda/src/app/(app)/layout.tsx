@@ -6,27 +6,20 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  let settings = {};
+  let settings: Record<string, unknown> & { learning_language?: string } = {};
   let dueCount = 0;
   if (user) {
-    const [settingsRes, dueRes] = await Promise.all([
-      supabase
-        .from("user_settings")
-        .select("level_system, auto_play_audio, translation_lang, show_level, display_lang")
-        .eq("user_id", user.id)
-        .single(),
-      supabase
-        .from("flashcards")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id)
-        .is("deleted_at", null)
-        .eq("learned", false)
-        .lte("sm2_next_review", new Date().toISOString()),
-    ]);
-    if (settingsRes.data) {
-      settings = settingsRes.data;
+    const { data: settingsData } = await supabase
+      .from("user_settings")
+      .select(
+        "level_system, auto_play_audio, translation_lang, show_level, display_lang, learning_language"
+      )
+      .eq("user_id", user.id)
+      .single();
+    if (settingsData) {
+      settings = settingsData;
     } else {
-      // show_level 列が未追加の環境向けフォールバック
+      // learning_language 等の列が未追加の環境向けフォールバック
       const { data: fallback } = await supabase
         .from("user_settings")
         .select("level_system, auto_play_audio, translation_lang")
@@ -34,7 +27,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         .single();
       settings = fallback ?? {};
     }
-    dueCount = dueRes.count ?? 0;
+    const lang = settings.learning_language ?? "en";
+    const { count } = await supabase
+      .from("flashcards")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("language", lang)
+      .is("deleted_at", null)
+      .eq("learned", false)
+      .lte("sm2_next_review", new Date().toISOString());
+    dueCount = count ?? 0;
   }
 
   return (

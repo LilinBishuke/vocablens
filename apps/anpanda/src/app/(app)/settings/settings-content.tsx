@@ -20,6 +20,7 @@ interface UserSettings {
   auto_play_audio: boolean;
   show_level: boolean;
   display_lang?: string;
+  learning_language?: string;
 }
 
 interface Props {
@@ -49,7 +50,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
     const supabase = createClient();
     const { data: cards } = await supabase
       .from("flashcards")
-      .select("word, translation, level, definition")
+      .select("word, translation, level, definition, language")
       .eq("user_id", userId)
       .is("deleted_at", null);
     const targets = (cards ?? []).filter((c) => {
@@ -68,7 +69,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
         const res = await fetch("/api/enrich", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ word: t.word }),
+          body: JSON.stringify({ word: t.word, language: t.language }),
         });
         if (res.status === 501) {
           setBulkStatus("AI取得が未設定です");
@@ -96,6 +97,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
     auto_play_audio: true,
     show_level: true,
     display_lang: "ja",
+    learning_language: "en",
   };
 
   const [s, setS] = useState<UserSettings>({ ...defaults, ...settings });
@@ -141,7 +143,12 @@ export function SettingsContent({ email, settings, userId }: Props) {
       return;
     }
     // 表示に影響する設定は即時反映（レイアウトの設定コンテキストを再取得）
-    if (key === "display_lang" || key === "show_level" || key === "level_system") {
+    if (
+      key === "display_lang" ||
+      key === "show_level" ||
+      key === "level_system" ||
+      key === "learning_language"
+    ) {
       router.refresh();
     }
   }
@@ -239,6 +246,16 @@ export function SettingsContent({ email, settings, userId }: Props) {
         {/* 学習 */}
         <SettingsSection label={t("settings.study")}>
           <SettingsCard>
+            <SettingsPickerRow
+              label={t("settings.learningLang")}
+              value={s.learning_language ?? "en"}
+              options={[
+                { label: t("common.langEn"), value: "en" },
+                { label: t("common.langJa"), value: "ja" },
+              ]}
+              onSelect={(v) => updateSetting("learning_language", v)}
+            />
+            <Divider />
             <SettingsPickerRow
               label={t("settings.dailyLimit")}
               value={String(s.daily_limit)}

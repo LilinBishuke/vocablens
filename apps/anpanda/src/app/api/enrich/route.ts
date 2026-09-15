@@ -29,6 +29,38 @@ interface EnrichPayload {
   antonyms: { word: string; ja: string }[];
 }
 
+const JA_WORD_RE =
+  /^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}々〆ーｰ〜・]{1,30}$/u;
+
+const LANG_LABEL: Record<string, string> = {
+  ja: "日本語",
+  en: "英語",
+  zh: "中国語（簡体字）",
+  ko: "韓国語",
+};
+
+/** 日本語単語用プロンプト。意味・説明は targetLang（翻訳言語設定）で生成する */
+function buildPromptJa(word: string, targetLang: string): string {
+  const target = LANG_LABEL[targetLang] ?? "英語";
+  return `あなたは日本語学習アプリの辞書エディターです。日本語の単語「${word}」について、${target}話者の日本語学習者向けの情報を JSON だけで返してください。説明文やコードブロックは不要です。
+
+次のスキーマに厳密に従うこと:
+{
+  "level": 1〜5の整数（JLPT基準: 1=N5, 2=N4, 3=N3, 4=N2, 5=N1）,
+  "translation": "${target}での代表的な訳（簡潔に）",
+  "pos": "主な品詞（${target}で。例: 名詞 / 動詞 / 形容詞）",
+  "meanings": [{"en": "${target}での意味の説明", "ja": "やさしい日本語での言い換え"}] （意味が複数あれば重要順に最大4件）,
+  "etymology": "語源・漢字の成り立ちの解説（${target}で1〜2文。漢字の意味の分解があれば示す）",
+  "grammar": "文法・使い方（${target}で1〜2文。活用の型、よく使う助詞や共起表現）",
+  "slang": "口語・俗語での用法（あれば${target}で1〜2文、なければ null）",
+  "examples": [{"en": "自然な日本語の例文", "ja": "その${target}訳"}] （2件。日常で使う自然な文）,
+  "phonetic": "読み仮名（ひらがな。例: きぼう）",
+  "conjugations": [{"label": "活用形の名前（${target}で）", "value": "その形"}] （動詞なら ます形/て形/た形/ない形/可能形、い形容詞なら 過去形/否定形。活用しない語は []）,
+  "synonyms": [{"word": "日本語の類義語", "ja": "${target}訳", "diff": "見出し語との使い分け・ニュアンスの違い（${target}で1文）"}] （重要順に最大3件。なければ []）,
+  "antonyms": [{"word": "日本語の反対語", "ja": "${target}訳"}] （最大3件。なければ []）
+}`;
+}
+
 function buildPrompt(word: string): string {
   return `あなたは英語学習アプリの辞書エディターです。英単語 "${word}" について、日本人学習者向けの情報を JSON だけで返してください。説明文やコードブロックは不要です。
 
@@ -49,7 +81,11 @@ function buildPrompt(word: string): string {
 }`;
 }
 
-async function callGemini(word: string, apiKey: string): Promise<EnrichPayload | null> {
+async function callGemini(
+  word: string,
+  apiKey: string,
+  prompt: string
+): Promise<EnrichPayload | null> {
   const res = await fetch(geminiUrl(apiKey), {
     method: "POST",
     headers: {
@@ -57,7 +93,7 @@ async function callGemini(word: string, apiKey: string): Promise<EnrichPayload |
       "x-goog-api-key": apiKey,
     },
     body: JSON.stringify({
-      contents: [{ role: "user", parts: [{ text: buildPrompt(word) }] }],
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
       generationConfig: {
         responseMimeType: "application/json",
         temperature: 0.2,
@@ -102,7 +138,8 @@ const DEEPSEEK_OPTS: CompatOpts = {
 async function callOpenAICompat(
   word: string,
   apiKey: string,
-  opts: CompatOpts
+  opts: CompatOpts,
+  prompt: string
 ): Promise<EnrichPayload | null> {
   const res = await fetch(opts.url, {
     method: "POST",
@@ -112,7 +149,7 @@ async function callOpenAICompat(
     },
     body: JSON.stringify({
       model: opts.model,
-      messages: [{ role: "user", content: buildPrompt(word) }],
+      messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" },
       temperature: 0.2,
       max_tokens: 4000,
@@ -252,32 +289,50 @@ export async function POST(request: Request) {
   }
 
   let word = "";
+  let language: "en" | "ja" = "en";
   try {
     const body = await request.json();
-    word = String(body?.word ?? "").trim().toLowerCase();
+    language = body?.language === "ja" ? "ja" : "en";
+    word = String(body?.word ?? "").trim();
+    if (language === "en") word = word.toLowerCase();
   } catch {
     // fallthrough
   }
-  if (!word || !/^[a-z][a-z' -]{0,49}$/.test(word)) {
+  const validWord =
+    language === "ja" ? JA_WORD_RE.test(word) : /^[a-z][a-z' -]{0,49}$/.test(word);
+  if (!word || !validWord) {
     return NextResponse.json({ error: "invalid word" }, { status: 400 });
+  }
+
+  // 日本語モードは意味の言語を翻訳言語設定に合わせる
+  let prompt: string;
+  if (language === "ja") {
+    const { data: settings } = await supabase
+      .from("user_settings")
+      .select("translation_lang")
+      .eq("user_id", user.id)
+      .single();
+    prompt = buildPromptJa(word, settings?.translation_lang ?? "en");
+  } else {
+    prompt = buildPrompt(word);
   }
 
   const [primary, dictPhonetic] = await Promise.all([
     groqKey
-      ? callOpenAICompat(word, groqKey, GROQ_OPTS)
+      ? callOpenAICompat(word, groqKey, GROQ_OPTS, prompt)
       : deepseekKey
-        ? callOpenAICompat(word, deepseekKey, DEEPSEEK_OPTS)
-        : callGemini(word, geminiKey!),
-    fetchDictPhonetic(word),
+        ? callOpenAICompat(word, deepseekKey, DEEPSEEK_OPTS, prompt)
+        : callGemini(word, geminiKey!, prompt),
+    language === "en" ? fetchDictPhonetic(word) : Promise.resolve(null),
   ]);
 
   // 優先プロバイダが失敗した場合のフォールバック (DeepSeek → Gemini の順)
   let ai = primary;
   if (!ai && groqKey && deepseekKey) {
-    ai = await callOpenAICompat(word, deepseekKey, DEEPSEEK_OPTS);
+    ai = await callOpenAICompat(word, deepseekKey, DEEPSEEK_OPTS, prompt);
   }
   if (!ai && (groqKey || deepseekKey) && geminiKey) {
-    ai = await callGemini(word, geminiKey);
+    ai = await callGemini(word, geminiKey, prompt);
   }
 
   if (!ai) {
@@ -303,6 +358,7 @@ export async function POST(request: Request) {
     .select("id, level, translation, phonetic, synonyms")
     .eq("user_id", user.id)
     .eq("word", word)
+    .eq("language", language)
     .is("deleted_at", null)
     .single();
 
