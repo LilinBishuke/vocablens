@@ -31,6 +31,8 @@ export interface Flashcard {
   type: "vocab" | "slang" | "idiom";
   /** 学習言語: en=英単語, ja=日本語単語 */
   language: "en" | "ja";
+  /** ユーザーが手入力する自由メモ */
+  memo: string | null;
 
   sm2_repetitions: number;
   sm2_interval: number;

@@ -303,6 +303,9 @@ export function CardDetailContent({
           </section>
         )}
 
+        {/* メモ（手入力・blur時に自動保存） */}
+        <MemoSection cardId={card.id} initial={card.memo} />
+
         {/* フォルダ */}
         <AddToFolderSheet cardId={card.id} />
 
@@ -355,6 +358,61 @@ export function CardDetailContent({
         </Button>
       </div>
     </div>
+  );
+}
+
+function MemoSection({
+  cardId,
+  initial,
+}: {
+  cardId: string;
+  initial: string | null;
+}) {
+  const t = useT();
+  const [text, setText] = useState(initial ?? "");
+  const [status, setStatus] = useState<"idle" | "saved" | "error">("idle");
+  const savedTextRef = useRef(initial ?? "");
+
+  async function save() {
+    const value = text.trim();
+    if (value === savedTextRef.current.trim()) return;
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("flashcards")
+      .update({ memo: value || null })
+      .eq("id", cardId);
+    if (error) {
+      setStatus("error");
+      return;
+    }
+    savedTextRef.current = value;
+    setStatus("saved");
+    setTimeout(() => setStatus("idle"), 2000);
+  }
+
+  return (
+    <section className="space-y-2">
+      <div className="flex items-baseline justify-between">
+        <SectionLabel>{t("detail.memo")}</SectionLabel>
+        {status === "saved" && (
+          <span className="text-[10px] text-primary">{t("detail.memoSaved")}</span>
+        )}
+        {status === "error" && (
+          <span className="text-[10px] text-again">{t("detail.memoError")}</span>
+        )}
+      </div>
+      <textarea
+        value={text}
+        onChange={(e) => {
+          setText(e.target.value);
+          setStatus("idle");
+        }}
+        onBlur={save}
+        placeholder={t("detail.memoPlaceholder")}
+        rows={3}
+        className="glass-card w-full resize-none rounded-button px-4 py-3 text-[13px] leading-relaxed text-text-primary placeholder:text-text-muted outline-none transition-colors focus:border-primary"
+      />
+    </section>
   );
 }
 
