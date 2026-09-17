@@ -58,7 +58,7 @@ export function HomeContent({
       <Link
         href="/summary"
         className="glass-card flex items-center gap-1 rounded-card px-3 py-2.5 transition-all active:scale-[0.98]"
-        aria-label="学習サマリーを見る"
+        aria-label={t("aria.viewSummary")}
       >
         <StatChip value={String(stats.learnedCount)} label={t("home.learned")} />
         <StatChip value={`${stats.accuracyPercent}%`} label={t("home.accuracy")} />

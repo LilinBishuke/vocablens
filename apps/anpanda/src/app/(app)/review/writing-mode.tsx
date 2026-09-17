@@ -1,11 +1,13 @@
 "use client";
 
 import { useReviewStore } from "@/lib/stores/review-store";
+import { useT } from "@/lib/contexts/settings-context";
 import { calculateSM2, QUALITY_MAP } from "@/lib/utils/sm2";
 import { createClient } from "@/lib/supabase/client";
 import type { Flashcard } from "@/lib/types";
 
 export function WritingMode({ card }: { card: Flashcard }) {
+  const t = useT();
   const {
     writingAnswer,
     setWritingAnswer,
@@ -90,7 +92,8 @@ export function WritingMode({ card }: { card: Flashcard }) {
 
           {/* POS + character count hint */}
           <span className="rounded-chip bg-progress-bar px-3 py-1 text-xs text-text-muted">
-            {card.definition?.pos ?? "Word"} · {card.word.length}文字
+            {card.definition?.pos ?? "Word"} · {card.word.length}
+            {t("writing.charsUnit")}
           </span>
 
           <div className="h-px w-full bg-surface-border" />
@@ -101,7 +104,7 @@ export function WritingMode({ card }: { card: Flashcard }) {
             value={writingAnswer}
             onChange={(e) => setWritingAnswer(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-            placeholder="英単語を入力..."
+            placeholder={t("writing.placeholder")}
             disabled={writingResult !== null}
             className="h-12 w-full rounded-[12px] border border-surface-border bg-background px-4 text-base text-text-primary placeholder:text-text-muted outline-none focus:border-primary transition-colors disabled:opacity-60"
             autoFocus
@@ -114,8 +117,8 @@ export function WritingMode({ card }: { card: Flashcard }) {
               className="text-[13px] text-primary cursor-pointer"
             >
               {showHint
-                ? `ヒント: ${hintText}`
-                : "ヒントを見る（最初の2文字）"}
+                ? `${t("writing.hintLabel")}: ${hintText}`
+                : t("writing.showHint")}
             </button>
           )}
 
@@ -129,11 +132,13 @@ export function WritingMode({ card }: { card: Flashcard }) {
                     : "bg-again/10 text-again"
                 }`}
               >
-                {writingResult === "correct" ? "✓ 正解！" : "✗ 不正解"}
+                {writingResult === "correct"
+                  ? t("writing.correct")
+                  : t("writing.incorrect")}
               </span>
               {writingResult === "incorrect" && (
                 <p className="text-sm text-text-secondary">
-                  正解:{" "}
+                  {t("writing.answer")}:{" "}
                   <span className="font-mono font-semibold text-text-primary">
                     {card.word}
                   </span>
@@ -151,7 +156,7 @@ export function WritingMode({ card }: { card: Flashcard }) {
           disabled={!writingAnswer.trim() && !writingResult}
           className="flex h-12 w-full items-center justify-center rounded-button bg-primary text-base font-semibold text-on-primary shadow-button-glow transition-all active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          {writingResult ? "次へ" : "回答する"}
+          {writingResult ? t("writing.next") : t("writing.submit")}
         </button>
       </div>
     </>

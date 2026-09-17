@@ -108,7 +108,10 @@ export function AddToFolderSheet({ cardId }: { cardId: string }) {
           {t("detail.addToFolder")}
         </span>
         {memberCount != null && memberCount > 0 && (
-          <span className="text-xs text-text-secondary">{memberCount}件</span>
+          <span className="text-xs text-text-secondary">
+            {memberCount}
+            {t("common.itemsUnit")}
+          </span>
         )}
         <span className="text-text-muted" aria-hidden>›</span>
       </button>
@@ -116,7 +119,7 @@ export function AddToFolderSheet({ cardId }: { cardId: string }) {
       {open && (
         <div className="fixed inset-0 z-50 flex flex-col justify-end">
           <button
-            aria-label="閉じる"
+            aria-label={t("common.close")}
             onClick={() => setOpen(false)}
             className="absolute inset-0 bg-[#0F1A14]/45"
           />
@@ -128,7 +131,7 @@ export function AddToFolderSheet({ cardId }: { cardId: string }) {
               </h2>
               <button
                 onClick={() => setOpen(false)}
-                aria-label="閉じる"
+                aria-label={t("common.close")}
                 className="text-text-muted cursor-pointer"
               >
                 <X size={20} />
@@ -168,7 +171,7 @@ export function AddToFolderSheet({ cardId }: { cardId: string }) {
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-                    placeholder="フォルダ名"
+                    placeholder={t("folder.name")}
                     className="h-10 min-w-0 flex-1 rounded-[10px] bg-surface px-3 text-sm text-text-primary placeholder:text-text-muted outline-none"
                   />
                   <button
@@ -176,7 +179,7 @@ export function AddToFolderSheet({ cardId }: { cardId: string }) {
                     disabled={!newName.trim()}
                     className="h-10 shrink-0 rounded-[10px] bg-primary px-4 text-[13px] font-semibold text-on-primary disabled:opacity-40 cursor-pointer"
                   >
-                    作成
+                    {t("folder.create")}
                   </button>
                 </div>
               ) : (
@@ -185,7 +188,7 @@ export function AddToFolderSheet({ cardId }: { cardId: string }) {
                   className="flex w-full items-center justify-center gap-1.5 rounded-button border-[1.5px] border-dashed border-surface-border py-3 text-[13px] font-medium text-text-secondary transition-colors hover:text-text-primary cursor-pointer"
                 >
                   <Plus size={15} />
-                  新しいフォルダを作成
+                  {t("folder.createNew")}
                 </button>
               )}
             </div>

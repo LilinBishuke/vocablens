@@ -54,10 +54,10 @@ export function CardDetailContent({
         } else if (res.ok) {
           router.refresh();
         } else {
-          setEnrichError("情報の生成に失敗しました。時間をおいて再度開いてください");
+          setEnrichError(t("detail.enrichFailed"));
         }
       } catch {
-        setEnrichError("通信エラーが発生しました");
+        setEnrichError(t("detail.networkError"));
       }
       setEnriching(false);
     })();
@@ -65,14 +65,14 @@ export function CardDetailContent({
   }, [card.word]);
 
   async function handleDelete() {
-    if (!confirm("このカードを削除しますか？")) return;
+    if (!confirm(t("detail.deleteConfirm"))) return;
     const supabase = createClient();
     const { error } = await supabase
       .from("flashcards")
       .update({ deleted_at: new Date().toISOString() })
       .eq("id", card.id);
     if (error) {
-      alert("削除に失敗しました。もう一度お試しください。");
+      alert(t("detail.deleteFailed"));
       return;
     }
     router.push("/cards");
@@ -128,7 +128,7 @@ export function CardDetailContent({
           <button
             onClick={handleSpeak}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 cursor-pointer"
-            aria-label="発音を再生"
+            aria-label={t("aria.speak")}
           >
             <Volume2 size={17} className="text-primary" />
           </button>
@@ -139,7 +139,7 @@ export function CardDetailContent({
           {card.learned && (
             <span className="inline-flex items-center gap-1 rounded-badge bg-progress-bar px-2.5 py-0.5 text-[11px] text-text-muted">
               <Check size={12} />
-              覚えた
+              {t("common.learned")}
             </span>
           )}
         </div>
@@ -158,7 +158,7 @@ export function CardDetailContent({
         )}
         {aiUnavailable && needsEnrich && (
           <p className="glass-card rounded-button px-4 py-3 text-xs text-text-secondary">
-            AI取得が未設定のため、一部の情報を表示できません
+            {t("detail.aiNotConfigured")}
           </p>
         )}
         {/* コンテンツが空のときだけエラーを見せる（既に情報があるなら静かに） */}
@@ -344,7 +344,7 @@ export function CardDetailContent({
                 {card.source_title ?? card.source_url}
               </p>
               <p className="text-[11px] text-text-muted">
-                {card.source_type === "video" ? "YouTube" : "Webページ"}
+                {card.source_type === "video" ? "YouTube" : t("detail.webpage")}
                 {card.source_timestamp && ` · ${card.source_timestamp}`}
               </p>
             </div>

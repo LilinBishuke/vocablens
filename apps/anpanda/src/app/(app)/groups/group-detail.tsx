@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { Header } from "@/components/layout";
 import { WordRow } from "@/components/ui";
+import { useT } from "@/lib/contexts/settings-context";
 
 export interface GroupCard {
   id: string;
@@ -20,6 +23,7 @@ export function GroupDetail({
   cards: GroupCard[];
   reviewHref: string;
 }) {
+  const t = useT();
   const now = new Date().toISOString();
   const dueCount = cards.filter(
     (c) => !c.learned && c.sm2_next_review <= now
@@ -27,10 +31,21 @@ export function GroupDetail({
 
   return (
     <>
-      <Header variant="detail" title={title} />
+      <Header
+        variant="detail"
+        title={
+          title === "その他"
+            ? t("groups.other")
+            : title === "手動で追加"
+              ? t("groups.manual")
+              : title
+        }
+      />
       <div className="flex-1 space-y-4 px-page pb-8">
         <p className="text-xs text-text-secondary">
-          {cards.length}枚 · 復習待ち {dueCount}枚
+          {cards.length}
+          {t("common.cardsUnit")} · {t("groups.due")} {dueCount}
+          {t("common.cardsUnit")}
         </p>
 
         {dueCount > 0 && (
@@ -38,7 +53,7 @@ export function GroupDetail({
             href={reviewHref}
             className="flex h-12 w-full items-center justify-center rounded-button bg-primary text-[15px] font-semibold text-on-primary shadow-button-glow transition-all active:scale-[0.97]"
           >
-            このグループを復習する（{dueCount}枚）
+            {t("groups.reviewThis", { n: dueCount })}
           </Link>
         )}
 
@@ -51,9 +66,9 @@ export function GroupDetail({
               level={c.level}
               rightLabel={
                 c.learned
-                  ? "覚えた"
+                  ? t("common.learned")
                   : c.sm2_next_review <= now
-                    ? "次: 今日"
+                    ? `${t("groups.next")}: ${t("detail.today")}`
                     : null
               }
               rightHighlight={!c.learned && c.sm2_next_review <= now}
@@ -61,7 +76,7 @@ export function GroupDetail({
           ))}
           {cards.length === 0 && (
             <p className="py-8 text-center text-sm text-text-muted">
-              このグループにはまだカードがありません
+              {t("groups.empty")}
             </p>
           )}
         </div>

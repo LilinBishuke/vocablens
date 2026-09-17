@@ -1,5 +1,7 @@
 "use client";
 
+import { useT } from "@/lib/contexts/settings-context";
+
 /**
  * 5段階フェイス評価。
  * SM-2 の quality (0-5) にマップする: しかめ顔=0 → 大きな笑顔=5。
@@ -7,11 +9,11 @@
  */
 
 export const FACE_RATINGS = [
-  { key: "face1", quality: 0, label: "全然" },
-  { key: "face2", quality: 2, label: "忘れた" },
-  { key: "face3", quality: 3, label: "ぎりぎり" },
-  { key: "face4", quality: 4, label: "できた" },
-  { key: "face5", quality: 5, label: "余裕" },
+  { key: "face1", quality: 0, labelKey: "rate.q0" },
+  { key: "face2", quality: 2, labelKey: "rate.q2" },
+  { key: "face3", quality: 3, labelKey: "rate.q3" },
+  { key: "face4", quality: 4, labelKey: "rate.q4" },
+  { key: "face5", quality: 5, labelKey: "rate.q5" },
 ] as const;
 
 export type FaceKey = (typeof FACE_RATINGS)[number]["key"];
@@ -62,15 +64,20 @@ interface FaceRatingProps {
 }
 
 export function FaceRating({ onRate, disabled = false }: FaceRatingProps) {
+  const t = useT();
   return (
-    <div className="flex items-center justify-center gap-3" role="group" aria-label="覚えていましたか？">
+    <div
+      className="flex items-center justify-center gap-3"
+      role="group"
+      aria-label={t("review.remembered")}
+    >
       {FACE_RATINGS.map((r, i) => (
         <button
           key={r.key}
           type="button"
           disabled={disabled}
           onClick={() => onRate(r)}
-          aria-label={r.label}
+          aria-label={t(r.labelKey)}
           className="flex h-12 w-12 items-center justify-center rounded-full text-text-muted/55 transition-all cursor-pointer hover:text-text-secondary active:scale-90 active:text-primary disabled:opacity-40"
         >
           <FaceIcon index={i} />

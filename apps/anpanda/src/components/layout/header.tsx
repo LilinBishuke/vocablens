@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Settings, X } from "lucide-react";
+import { useT } from "@/lib/contexts/settings-context";
 
 interface HomeHeaderProps {
   variant: "home";
@@ -34,6 +35,7 @@ type HeaderProps =
   | ReviewHeaderProps;
 
 export function Header(props: HeaderProps) {
+  const t = useT();
   const router = useRouter();
 
   const base =
@@ -46,7 +48,7 @@ export function Header(props: HeaderProps) {
           <Image src="/logo.svg" alt="Anpanda" width={34} height={34} />
           <span className="text-lg font-bold text-text-primary">Anpanda</span>
         </div>
-        <Link href="/settings" aria-label="設定">
+        <Link href="/settings" aria-label={t("tab.settings")}>
           <Settings size={22} className="text-text-muted" />
         </Link>
       </header>
@@ -67,7 +69,7 @@ export function Header(props: HeaderProps) {
       <header className={`${base} gap-3`}>
         <button
           onClick={() => router.back()}
-          aria-label="戻る"
+          aria-label={t("common.back")}
           className="text-text-muted hover:text-text-secondary transition-colors cursor-pointer"
         >
           <ArrowLeft size={22} />
@@ -82,7 +84,7 @@ export function Header(props: HeaderProps) {
     <header className={`${base} justify-between`}>
       <button
         onClick={props.onClose}
-        aria-label="閉じる"
+        aria-label={t("common.close")}
         className="text-text-muted hover:text-text-secondary transition-colors cursor-pointer"
       >
         <X size={22} />

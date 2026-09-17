@@ -5,6 +5,7 @@ import { useReviewStore } from "@/lib/stores/review-store";
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useRef, useState } from "react";
 import { FACE_RATINGS, FaceIcon } from "@/components/ui/face-rating";
+import { useT } from "@/lib/contexts/settings-context";
 
 interface PuzzleInfo {
   puzzleName: string;
@@ -16,6 +17,7 @@ interface PuzzleInfo {
 }
 
 export function ReviewComplete() {
+  const t = useT();
   const router = useRouter();
   const { sessionStats, reset } = useReviewStore();
   const savedRef = useRef(false);
@@ -103,7 +105,7 @@ export function ReviewComplete() {
             router.push("/");
           }}
           className="text-text-muted cursor-pointer"
-          aria-label="閉じる"
+          aria-label={t("common.close")}
         >
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M18 6 6 18" />
@@ -119,24 +121,26 @@ export function ReviewComplete() {
           <div className="flex flex-col items-center gap-2 animate-bounce-once">
             <span className="text-5xl">🎉</span>
             <p className="text-lg font-bold text-primary text-center">
-              パズル完成！
+              {t("complete.puzzleDone")}
             </p>
             <p className="text-sm text-text-secondary text-center">
-              「{puzzleInfo.puzzleName}」をコンプリートしました！
+              {t("complete.puzzleDoneDesc", { name: puzzleInfo.puzzleName })}
             </p>
           </div>
         )}
 
         {/* Title */}
         <div className="flex flex-col items-center gap-1.5">
-          <h1 className="text-2xl font-bold text-text-primary">お疲れ様！</h1>
+          <h1 className="text-2xl font-bold text-text-primary">
+            {t("complete.title")}
+          </h1>
           {puzzleInfo && puzzleInfo.piecesRevealed < puzzleInfo.totalPieces ? (
             <p className="text-sm font-semibold text-primary">
-              新しいピースが開放されました！
+              {t("complete.newPiece")}
             </p>
           ) : !puzzleInfo ? (
             <p className="text-[15px] text-text-secondary">
-              {total}枚復習しました
+              {t("complete.reviewedCount", { n: total })}
             </p>
           ) : null}
         </div>
@@ -176,7 +180,8 @@ export function ReviewComplete() {
                 {puzzleInfo.puzzleName}
               </span>
               <span className="text-xs font-semibold text-primary">
-                {puzzleInfo.piecesRevealed} / {puzzleInfo.totalPieces} ピース
+                {puzzleInfo.piecesRevealed} / {puzzleInfo.totalPieces}{" "}
+                {t("puzzle.pieces")}
               </span>
             </div>
           </div>
@@ -186,15 +191,20 @@ export function ReviewComplete() {
         <div className="flex w-full gap-3">
           <div className="glass-card flex flex-1 flex-col items-center gap-0.5 rounded-button p-3.5">
             <span className="text-lg font-bold text-text-primary">
-              {total}枚
+              {total}
+              {t("common.cardsUnit")}
             </span>
-            <span className="text-[11px] text-text-muted">復習数</span>
+            <span className="text-[11px] text-text-muted">
+              {t("complete.reviews")}
+            </span>
           </div>
           <div className="glass-card flex flex-1 flex-col items-center gap-0.5 rounded-button p-3.5">
             <span className="text-lg font-bold text-primary">
               {accuracyPercent}%
             </span>
-            <span className="text-[11px] text-text-muted">正解率</span>
+            <span className="text-[11px] text-text-muted">
+              {t("home.accuracy")}
+            </span>
           </div>
         </div>
 
@@ -204,7 +214,7 @@ export function ReviewComplete() {
             {FACE_RATINGS.map((r, i) => (
               <div key={r.key}>
                 {i > 0 && <div className="h-px bg-surface-border" />}
-                <BreakdownRow faceIndex={i} label={r.label} count={ratings[r.key] ?? 0} />
+                <BreakdownRow faceIndex={i} label={t(r.labelKey)} count={ratings[r.key] ?? 0} />
               </div>
             ))}
           </div>
@@ -217,7 +227,7 @@ export function ReviewComplete() {
           onClick={handleRestart}
           className="flex h-12 w-full items-center justify-center rounded-button bg-primary text-base font-semibold text-on-primary shadow-button-glow cursor-pointer"
         >
-          もう一度復習する
+          {t("complete.again")}
         </button>
         <button
           onClick={() => {
@@ -226,7 +236,7 @@ export function ReviewComplete() {
           }}
           className="flex h-12 w-full items-center justify-center glass-card rounded-button text-base font-medium text-text-primary cursor-pointer"
         >
-          ホームに戻る
+          {t("common.backHome")}
         </button>
       </div>
     </div>
@@ -242,13 +252,17 @@ function BreakdownRow({
   label: string;
   count: number;
 }) {
+  const t = useT();
   return (
     <div className="flex items-center justify-between px-4 py-2.5">
       <div className="flex items-center gap-2.5">
         <FaceIcon index={faceIndex} size={20} className={count > 0 ? "text-primary" : "text-text-muted/55"} />
         <span className="text-sm text-text-secondary">{label}</span>
       </div>
-      <span className="text-sm font-medium text-text-primary">{count}枚</span>
+      <span className="text-sm font-medium text-text-primary">
+        {count}
+        {t("common.cardsUnit")}
+      </span>
     </div>
   );
 }

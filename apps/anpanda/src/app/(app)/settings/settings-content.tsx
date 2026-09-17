@@ -46,7 +46,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
 
   async function handleBulkEnrich() {
     if (bulkStatus) return;
-    setBulkStatus("対象を確認中...");
+    setBulkStatus(t("settings.bulkChecking"));
     const supabase = createClient();
     const { data: cards } = await supabase
       .from("flashcards")
@@ -58,21 +58,23 @@ export function SettingsContent({ email, settings, userId }: Props) {
       return !d?.etymology || !c.translation || !Number.isFinite(Number(c.level));
     });
     if (targets.length === 0) {
-      setBulkStatus("すべて取得済みです");
+      setBulkStatus(t("settings.bulkDone"));
       setTimeout(() => setBulkStatus(null), 3000);
       return;
     }
     let done = 0;
-    for (const t of targets) {
-      setBulkStatus(`生成中 ${done + 1}/${targets.length}...`);
+    for (const target of targets) {
+      setBulkStatus(
+        t("settings.bulkProgress", { done: done + 1, total: targets.length })
+      );
       try {
         const res = await fetch("/api/enrich", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ word: t.word, language: t.language }),
+          body: JSON.stringify({ word: target.word, language: target.language }),
         });
         if (res.status === 501) {
-          setBulkStatus("AI取得が未設定です");
+          setBulkStatus(t("settings.bulkNotConfigured"));
           setTimeout(() => setBulkStatus(null), 4000);
           return;
         }
@@ -81,7 +83,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
       }
       done++;
     }
-    setBulkStatus(`完了（${done}枚）`);
+    setBulkStatus(t("settings.bulkComplete", { n: done }));
     router.refresh();
     setTimeout(() => setBulkStatus(null), 4000);
   }
@@ -110,23 +112,19 @@ export function SettingsContent({ email, settings, userId }: Props) {
     { label: "한국어", value: "ko" },
   ];
 
-  const dailyLimitOptions = [
-    { label: "10枚", value: "10" },
-    { label: "20枚", value: "20" },
-    { label: "30枚", value: "30" },
-    { label: "50枚", value: "50" },
-  ];
+  const dailyLimitOptions = ["10", "20", "30", "50"].map((v) => ({
+    label: `${v}${t("common.cardsUnit")}`,
+    value: v,
+  }));
 
-  const newCardsOptions = [
-    { label: "3枚/日", value: "3" },
-    { label: "5枚/日", value: "5" },
-    { label: "10枚/日", value: "10" },
-    { label: "20枚/日", value: "20" },
-  ];
+  const newCardsOptions = ["3", "5", "10", "20"].map((v) => ({
+    label: `${v}${t("settings.perDayUnit")}`,
+    value: v,
+  }));
 
   const levelSystemOptions = [
-    { label: "3段階", value: "3" },
-    { label: "5段階", value: "5" },
+    { label: t("settings.scale3"), value: "3" },
+    { label: t("settings.scale5"), value: "5" },
   ];
 
   async function updateSetting(key: string, value: unknown) {
@@ -137,9 +135,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
       .update({ [key]: value })
       .eq("user_id", userId);
     if (error) {
-      alert(
-        "設定を保存できませんでした。データベースの更新（SQL実行）が必要な可能性があります"
-      );
+      alert(t("common.dbUpdateError"));
       return;
     }
     // 表示に影響する設定は即時反映（レイアウトの設定コンテキストを再取得）
@@ -164,7 +160,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
   async function handleImportVocabLens(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setImportStatus("読み込み中...");
+    setImportStatus(t("settings.importing"));
     try {
       const text = await file.text();
       const cards = JSON.parse(text);
@@ -175,13 +171,15 @@ export function SettingsContent({ email, settings, userId }: Props) {
       });
       const data = await res.json();
       if (data.error) {
-        setImportStatus(`エラー: ${data.error}`);
+        setImportStatus(t("settings.importErrorDetail", { msg: data.error }));
       } else {
-        setImportStatus(`✓ ${data.imported}件インポート（${data.skipped}件スキップ）`);
+        setImportStatus(
+          t("settings.importDone", { imported: data.imported, skipped: data.skipped })
+        );
         router.refresh();
       }
     } catch {
-      setImportStatus("ファイルの読み込みに失敗しました");
+      setImportStatus(t("settings.importError"));
     }
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
@@ -197,7 +195,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
       .order("created_at", { ascending: false });
 
     if (!cards || cards.length === 0) {
-      alert("エクスポートするカードがありません");
+      alert(t("settings.exportEmpty"));
       return;
     }
 
@@ -322,7 +320,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
             <Divider />
             <SettingsRow
               label={t("settings.theme")}
-              value={themeLabels[theme] ?? "システム"}
+              value={themeLabels[theme] ?? t("settings.themeSystem")}
               onClick={cycleTheme}
             />
             <Divider />
@@ -374,7 +372,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
             <Divider />
             <button
               onClick={() => fileInputRef.current?.click()}
-              disabled={importStatus === "読み込み中..."}
+              disabled={importStatus === t("settings.importing")}
               className="flex w-full items-center justify-between px-4 py-3.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div className="flex items-center gap-3">
@@ -402,7 +400,7 @@ export function SettingsContent({ email, settings, userId }: Props) {
                 const token = data.session?.access_token;
                 if (token) {
                   await navigator.clipboard.writeText(token);
-                  setImportStatus("トークンをコピーしました");
+                  setImportStatus(t("settings.tokenCopied"));
                   setTimeout(() => setImportStatus(""), 3000);
                 }
               }}
@@ -414,8 +412,10 @@ export function SettingsContent({ email, settings, userId }: Props) {
                   Chrome拡張連携トークンをコピー
                 </span>
               </div>
-              {importStatus === "トークンをコピーしました" && (
-                <span className="text-[13px] font-medium text-good">コピー済み ✓</span>
+              {importStatus === t("settings.tokenCopied") && (
+                <span className="text-[13px] font-medium text-good">
+                  {t("settings.copied")}
+                </span>
               )}
             </button>
           </SettingsCard>

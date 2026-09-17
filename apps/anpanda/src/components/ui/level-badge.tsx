@@ -1,22 +1,22 @@
 "use client";
 
-import { useSettings } from "@/lib/contexts/settings-context";
+import { useSettings, useT } from "@/lib/contexts/settings-context";
 
-type LevelStyle = { label: string; dot: string };
+type LevelStyle = { labelKey: "level.1" | "level.2" | "level.3" | "level.4" | "level.5"; dot: string };
 
 // クラスは静的文字列で列挙する（Tailwind がソース走査でクラスを検出するため）
 const config5: Record<number, LevelStyle> = {
-  1: { label: "初級", dot: "bg-level-1" },
-  2: { label: "初中級", dot: "bg-level-2" },
-  3: { label: "中級", dot: "bg-level-3" },
-  4: { label: "中上級", dot: "bg-level-4" },
-  5: { label: "上級", dot: "bg-level-5" },
+  1: { labelKey: "level.1", dot: "bg-level-1" },
+  2: { labelKey: "level.2", dot: "bg-level-2" },
+  3: { labelKey: "level.3", dot: "bg-level-3" },
+  4: { labelKey: "level.4", dot: "bg-level-4" },
+  5: { labelKey: "level.5", dot: "bg-level-5" },
 };
 
 const config3: Record<number, LevelStyle> = {
-  1: { label: "初級", dot: "bg-level-1" },
-  2: { label: "中級", dot: "bg-level-3" },
-  3: { label: "上級", dot: "bg-level-5" },
+  1: { labelKey: "level.1", dot: "bg-level-1" },
+  2: { labelKey: "level.3", dot: "bg-level-3" },
+  3: { labelKey: "level.5", dot: "bg-level-5" },
 };
 
 function mapTo3(level: number): number {
@@ -44,6 +44,7 @@ const JLPT_LABEL: Record<number, string> = {
 /** 難易度表示: 小さな色ドット + 控えめな「Lv.n」表記（難易度は強調しない方針） */
 export function LevelBadge({ level, showLabel = false, stacked = false }: LevelBadgeProps) {
   const { level_system, show_level, learning_language } = useSettings();
+  const t = useT();
   const isJa = learning_language === "ja";
 
   // 設定で難易度表示オフ、または level が数値でないカードは表示しない
@@ -80,7 +81,7 @@ export function LevelBadge({ level, showLabel = false, stacked = false }: LevelB
       <span className={`h-[7px] w-[7px] shrink-0 rounded-full ${style.dot}`} />
       <span className="text-[10px] font-medium text-text-muted">
         {levelText}
-        {showLabel && !isJa && ` ${style.label}`}
+        {showLabel && !isJa && ` ${t(style.labelKey)}`}
       </span>
     </span>
   );

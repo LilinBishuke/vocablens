@@ -32,7 +32,7 @@ export function ReviewFront({ card }: { card: Flashcard }) {
             tabIndex={0}
             onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && flipCard()}
             className="animate-flip-in glass-card relative flex h-full w-full flex-col items-center justify-center gap-4 rounded-card-lg p-8 cursor-pointer transition-transform active:scale-[0.99]"
-            aria-label="タップして答えを見る"
+            aria-label={t("aria.reveal")}
           >
             {card.level && <LevelBadge level={Number(card.level)} showLabel />}
             <span className="text-[32px] font-bold text-text-primary">
@@ -47,7 +47,7 @@ export function ReviewFront({ card }: { card: Flashcard }) {
                 speak();
               }}
               className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 cursor-pointer"
-              aria-label="発音を再生"
+              aria-label={t("aria.speak")}
             >
               <Volume2 size={18} className="text-primary" />
             </button>

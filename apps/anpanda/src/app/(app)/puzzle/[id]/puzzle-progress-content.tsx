@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import { useT } from "@/lib/contexts/settings-context";
 import type { Puzzle } from "@/lib/types";
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export function PuzzleProgressContent({ puzzle, piecesRevealed }: Props) {
+  const t = useT();
   const router = useRouter();
 
   const totalPieces = puzzle.total_pieces;
@@ -28,7 +30,7 @@ export function PuzzleProgressContent({ puzzle, piecesRevealed }: Props) {
         <button
           onClick={() => router.back()}
           className="text-text-primary cursor-pointer"
-          aria-label="戻る"
+          aria-label={t("common.back")}
         >
           <ArrowLeft size={22} />
         </button>
@@ -40,10 +42,10 @@ export function PuzzleProgressContent({ puzzle, piecesRevealed }: Props) {
         <div className="flex w-full items-center justify-between">
           <div className="space-y-0.5">
             <p className="text-[15px] font-semibold text-text-primary">
-              {piecesRevealed} / {totalPieces} ピース開放
+              {piecesRevealed} / {totalPieces} {t("puzzle.piecesRevealed")}
             </p>
             <p className="text-xs text-text-secondary">
-              あと{remaining}セッションで完成！
+              {t("puzzle.remaining", { n: remaining })}
             </p>
           </div>
           <span className="text-2xl font-bold text-primary">{percent}%</span>
@@ -83,11 +85,15 @@ export function PuzzleProgressContent({ puzzle, piecesRevealed }: Props) {
         <div className="flex items-center justify-center gap-5">
           <div className="flex items-center gap-1.5">
             <div className="h-3 w-3 rounded-sm bg-primary/15 dark:bg-primary-strong" />
-            <span className="text-xs text-text-secondary">開放済み</span>
+            <span className="text-xs text-text-secondary">
+              {t("puzzle.revealed")}
+            </span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="h-3 w-3 rounded-sm border border-surface-border" />
-            <span className="text-xs text-text-secondary">未開放</span>
+            <span className="text-xs text-text-secondary">
+              {t("puzzle.locked")}
+            </span>
           </div>
         </div>
 
@@ -96,7 +102,7 @@ export function PuzzleProgressContent({ puzzle, piecesRevealed }: Props) {
           onClick={() => router.push("/puzzle")}
           className="flex h-11 w-full items-center justify-center rounded-button border border-surface-border bg-surface text-sm font-medium text-text-primary cursor-pointer"
         >
-          パズルを変更
+          {t("puzzle.change")}
         </button>
       </div>
     </div>

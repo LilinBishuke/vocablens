@@ -30,9 +30,7 @@ export function LanguageModeToggle() {
       .eq("user_id", user.id);
     if (error) {
       setPending(null);
-      alert(
-        "モードを切り替えられませんでした。データベースの更新（SQL実行）が必要な可能性があります"
-      );
+      alert(t("common.dbUpdateError"));
       return;
     }
     router.refresh();

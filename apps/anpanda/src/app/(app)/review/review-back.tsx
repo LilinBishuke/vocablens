@@ -100,7 +100,7 @@ export function ReviewBack({ card }: { card: Flashcard }) {
             <button
               onClick={handleSpeak}
               className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 cursor-pointer"
-              aria-label="発音を再生"
+              aria-label={t("aria.speak")}
             >
               <Volume2 size={16} className="text-primary" />
             </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useT } from "@/lib/contexts/settings-context";
 
 export default function AppError({
   reset,
@@ -8,6 +9,7 @@ export default function AppError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useT();
   const router = useRouter();
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
@@ -18,22 +20,20 @@ export default function AppError({
           <path d="M12 17h.01" />
         </svg>
       </div>
-      <p className="text-lg font-bold text-text-primary">問題が発生しました</p>
-      <p className="text-sm text-text-secondary">
-        一時的なエラーの可能性があります。もう一度お試しください。
-      </p>
+      <p className="text-lg font-bold text-text-primary">{t("error.title")}</p>
+      <p className="text-sm text-text-secondary">{t("error.desc")}</p>
       <div className="mt-2 flex w-full max-w-xs flex-col gap-2.5">
         <button
           onClick={() => reset()}
           className="flex h-12 w-full items-center justify-center rounded-button bg-primary text-[15px] font-semibold text-on-primary shadow-button-glow transition-all active:scale-[0.97] cursor-pointer"
         >
-          再試行する
+          {t("common.retry")}
         </button>
         <button
           onClick={() => router.push("/")}
           className="glass-card flex h-12 w-full items-center justify-center rounded-button text-[15px] font-medium text-text-primary transition-all active:scale-[0.97] cursor-pointer"
         >
-          ホームに戻る
+          {t("common.backHome")}
         </button>
       </div>
     </div>

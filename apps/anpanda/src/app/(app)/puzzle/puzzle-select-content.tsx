@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Puzzle as PuzzleIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useT } from "@/lib/contexts/settings-context";
 import type { Puzzle, UserPuzzle } from "@/lib/types";
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function PuzzleSelectContent({ puzzles, userPuzzles, userId }: Props) {
+  const t = useT();
   const router = useRouter();
 
   const progressMap = new Map(
@@ -56,22 +58,22 @@ export function PuzzleSelectContent({ puzzles, userPuzzles, userId }: Props) {
         <button
           onClick={() => router.back()}
           className="text-text-primary cursor-pointer"
-          aria-label="戻る"
+          aria-label={t("common.back")}
         >
           <ArrowLeft size={22} />
         </button>
-        <h1 className="text-lg font-bold text-text-primary">パズルを選ぶ</h1>
+        <h1 className="text-lg font-bold text-text-primary">
+          {t("puzzle.select")}
+        </h1>
       </header>
 
       <div className="flex-1 space-y-5 px-page py-5">
         {/* Description */}
         <div className="space-y-1">
           <p className="text-base font-semibold text-text-primary">
-            復習を続けてパズルを完成させよう！
+            {t("puzzle.keepGoing")}
           </p>
-          <p className="text-[13px] text-text-secondary">
-            1セッション完了 = 1ピース開放
-          </p>
+          <p className="text-[13px] text-text-secondary">{t("puzzle.rule")}</p>
         </div>
 
         {/* Grid (2 columns) */}
@@ -111,12 +113,12 @@ export function PuzzleSelectContent({ puzzles, userPuzzles, userId }: Props) {
                     </span>
                     {isActive && (
                       <span className="rounded-badge bg-primary px-2 py-0.5 text-[10px] font-semibold text-on-primary">
-                        進行中
+                        {t("puzzle.inProgress")}
                       </span>
                     )}
                   </div>
                   <span className="text-[11px] text-text-muted">
-                    {revealed} / {puzzle.total_pieces} ピース
+                    {revealed} / {puzzle.total_pieces} {t("puzzle.pieces")}
                   </span>
                 </div>
               </button>
@@ -126,7 +128,7 @@ export function PuzzleSelectContent({ puzzles, userPuzzles, userId }: Props) {
 
         {puzzles.length === 0 && (
           <p className="py-8 text-center text-sm text-text-muted">
-            パズルがまだありません
+            {t("puzzle.none")}
           </p>
         )}
       </div>

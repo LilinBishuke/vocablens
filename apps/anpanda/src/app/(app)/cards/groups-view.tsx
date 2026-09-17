@@ -84,7 +84,7 @@ export function GroupsView({ cards }: { cards: CardItem[] }) {
         </h2>
         {unavailable && (
           <p className="glass-card rounded-card px-4 py-3 text-xs text-text-secondary">
-            フォルダ機能の準備中です（データベース更新待ち）
+            {t("groups.folderPending")}
           </p>
         )}
         {folders === null && !unavailable && (
@@ -152,14 +152,19 @@ export function GroupsView({ cards }: { cards: CardItem[] }) {
             <span className="h-9 w-[52px] shrink-0 rounded-[8px] bg-primary/10" />
             <span className="min-w-0 flex-1">
               <span className="block truncate text-[13px] font-medium text-text-primary">
-                {title}
+                {title === "その他"
+                  ? t("groups.other")
+                  : title === "手動で追加"
+                    ? t("groups.manual")
+                    : title}
               </span>
               <span className="text-[11px] text-text-muted">
-                {info.count}枚
+                {info.count}
+                {t("common.cardsUnit")}
                 {info.type === "video"
                   ? " · YouTube"
                   : info.type === "webpage"
-                    ? " · Webページ"
+                    ? ` · ${t("detail.webpage")}`
                     : ""}
               </span>
             </span>

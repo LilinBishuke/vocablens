@@ -59,7 +59,7 @@ export default async function SummaryPage() {
 
   // 直近7日（今日含む）の日別復習数
   const weekly: { label: string; count: number; isToday: boolean }[] = [];
-  const dow = ["日", "月", "火", "水", "木", "金", "土"];
+  const dow = t("summary.dowList").split(",");
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
@@ -87,7 +87,13 @@ export default async function SummaryPage() {
   // よく学んでいる出典 上位3件
   const bySource = new Map<string, number>();
   for (const c of cards) {
-    const key = c.source_title || "その他";
+    const raw = c.source_title || "その他";
+    const key =
+      raw === "その他"
+        ? t("groups.other")
+        : raw === "手動で追加"
+          ? t("groups.manual")
+          : raw;
     bySource.set(key, (bySource.get(key) ?? 0) + 1);
   }
   const topSources = [...bySource.entries()]
